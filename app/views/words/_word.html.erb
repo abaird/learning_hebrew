@@ -1,0 +1,26 @@
+<div id="<%= dom_id word %>" class="w-full sm:w-auto my-5 space-y-5">
+  <div>
+    <strong class="block font-medium mb-1">Hebrew:</strong>
+    <%= word.representation %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Part of speech:</strong>
+    <%= word.part_of_speech %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Mnemonic:</strong>
+    <%= word.mnemonic %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Pronunciation audio url:</strong>
+    <%= word.pronunciation_url %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Picture url:</strong>
+    <%= word.picture_url %>
+  </div>
+  <div>
+    <strong class="block font-medium mb-1">Deck:</strong>
+    <%= word.deck_id %>
+  </div>
+</div>
