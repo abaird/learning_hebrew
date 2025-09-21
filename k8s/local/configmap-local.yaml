@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: learning-hebrew
+data:
+  RAILS_ENV: "development"  # Changed for local testing
+  RAILS_SKIP_CREDENTIALS: "true"  # Skip encrypted credentials for local testing
+  DATABASE_HOST: "postgres-service"
+  DATABASE_NAME: "learning_hebrew_development"  # Changed for local
+  RAILS_MAX_THREADS: "5"
+  RAILS_SERVE_STATIC_FILES: "true"
+  RAILS_LOG_TO_STDOUT: "true"
