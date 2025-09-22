@@ -60,6 +60,7 @@ development:
 test:
   <<: *default
   database: learning_hebrew_test
+  url: <%= ENV["DATABASE_URL"] %>
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is
@@ -92,14 +93,14 @@ production:
     <<: *primary_production
     database: learning_hebrew_production_cache
     migrations_paths: db/cache_migrate
-    url: <%= URI.parse(ENV["DATABASE_URL"]).tap { |url| url.path += "_cache" } if ENV["DATABASE_URL"] %>
+    url: <%= URI.parse(ENV["DATABASE_URL"]).tap { |url| url.path = (url.path.blank? ? "/" : url.path) + "_cache" } if ENV["DATABASE_URL"] %>
   queue:
     <<: *primary_production
     database: learning_hebrew_production_queue
     migrations_paths: db/queue_migrate
-    url: <%= URI.parse(ENV["DATABASE_URL"]).tap { |url| url.path += "_queue" } if ENV["DATABASE_URL"] %>
+    url: <%= URI.parse(ENV["DATABASE_URL"]).tap { |url| url.path = (url.path.blank? ? "/" : url.path) + "_queue" } if ENV["DATABASE_URL"] %>
   cable:
     <<: *primary_production
     database: learning_hebrew_production_cable
     migrations_paths: db/cable_migrate
-    url: <%= URI.parse(ENV["DATABASE_URL"]).tap { |url| url.path += "_cable" } if ENV["DATABASE_URL"] %>
+    url: <%= URI.parse(ENV["DATABASE_URL"]).tap { |url| url.path = (url.path.blank? ? "/" : url.path) + "_cable" } if ENV["DATABASE_URL"] %>
