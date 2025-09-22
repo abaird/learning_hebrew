@@ -7,11 +7,10 @@ metadata:
     kubernetes.io/ingress.class: "gce"
     kubernetes.io/ingress.global-static-ip-name: "learning-hebrew-ip"
     networking.gke.io/managed-certificates: "learning-hebrew-ssl"
-    kubernetes.io/ingress.allow-http: "false"
+    kubernetes.io/ingress.allow-http: "true"
 spec:
   rules:
-  - host: your-domain.com  # Replace with your domain
-    http:
+  - http:
       paths:
       - path: /
         pathType: Prefix

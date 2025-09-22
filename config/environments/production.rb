@@ -25,10 +25,19 @@ Rails.application.configure do
   config.active_storage.service = :local
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
-  config.assume_ssl = true
+  config.assume_ssl = false  # Disabled for HTTP-only access
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.force_ssl = true
+  config.force_ssl = false  # Disabled for testing without SSL
+
+  # Allow specific hosts for CSRF protection
+  config.hosts << "localhost"
+  config.hosts << "34.117.81.26"
+  config.hosts << "learning-hebrew.bairdsnet.net"
+
+  # Allow Kubernetes internal IPs
+  config.hosts << /10\.21\..*/ # GKE pod IP range
+  config.hosts << /34\.118\..*/ # GKE service IP range
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }

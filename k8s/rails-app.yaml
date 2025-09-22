@@ -15,7 +15,7 @@ spec:
     spec:
       initContainers:
       - name: db-migrate
-        image: gcr.io/YOUR_PROJECT_ID/learning-hebrew:latest
+        image: us-central1-docker.pkg.dev/learning-hebrew-1758491674/learning-hebrew/learning-hebrew:latest
         command: ["bin/rails", "db:migrate"]
         envFrom:
         - configMapRef:
@@ -40,7 +40,7 @@ spec:
               key: rails-master-key
       containers:
       - name: rails-app
-        image: gcr.io/YOUR_PROJECT_ID/learning-hebrew:latest
+        image: us-central1-docker.pkg.dev/learning-hebrew-1758491674/learning-hebrew/learning-hebrew:latest
         ports:
         - containerPort: 3000
         envFrom:

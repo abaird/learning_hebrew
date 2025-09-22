@@ -10,3 +10,5 @@ data:
   RAILS_MAX_THREADS: "5"
   RAILS_SERVE_STATIC_FILES: "true"
   RAILS_LOG_TO_STDOUT: "true"
+  RAILS_FORCE_SSL: "false"
+  RAILS_ALLOWED_HOSTS: "localhost,34.117.81.26,learning-hebrew.bairdsnet.net"

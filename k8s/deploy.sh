@@ -3,17 +3,28 @@
 # GKE Deployment Script for Learning Hebrew App
 set -e
 
-PROJECT_ID="your-project-id"  # Replace with your GCP project ID
+PROJECT_ID="learning-hebrew-1758491674"
 CLUSTER_NAME="learning-hebrew-cluster"
 REGION="us-central1"
 IMAGE_NAME="learning-hebrew"
 
-echo "Building and pushing Docker image..."
-# Build and tag the image
-docker build -t gcr.io/$PROJECT_ID/$IMAGE_NAME:latest .
+echo "Setting up Artifact Registry..."
+# Enable Artifact Registry API
+gcloud services enable artifactregistry.googleapis.com --project=$PROJECT_ID
 
-# Push to Google Container Registry
-docker push gcr.io/$PROJECT_ID/$IMAGE_NAME:latest
+# Create repository if it doesn't exist
+gcloud artifacts repositories create $IMAGE_NAME \
+    --repository-format=docker \
+    --location=$REGION \
+    --description="Learning Hebrew Rails app" \
+    --project=$PROJECT_ID 2>/dev/null || echo "Repository already exists"
+
+echo "Building and pushing Docker image..."
+# Build and tag the image for Artifact Registry
+docker build -t $REGION-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME/$IMAGE_NAME:latest .
+
+# Push to Artifact Registry
+docker push $REGION-docker.pkg.dev/$PROJECT_ID/$IMAGE_NAME/$IMAGE_NAME:latest
 
 echo "Creating GKE Autopilot cluster..."
 gcloud container clusters create-auto $CLUSTER_NAME \

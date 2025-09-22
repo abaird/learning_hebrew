@@ -2,7 +2,13 @@
   "permissions": {
     "allow": [
       "Bash(chmod:*)",
-      "Bash(kubectl get pods:*)"
+      "Bash(kubectl get pods:*)",
+      "Bash(docker push:*)",
+      "Bash(kubectl logs:*)",
+      "Bash(curl:*)",
+      "Bash(docker buildx build:*)",
+      "Bash(kubectl rollout restart:*)",
+      "Bash(kubectl describe:*)"
     ],
     "deny": [],
     "ask": []
