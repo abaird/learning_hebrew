@@ -15,19 +15,14 @@ spec:
     spec:
       initContainers:
       - name: db-migrate
-        image: learning-hebrew:latest
-        imagePullPolicy: Never
+        image: us-central1-docker.pkg.dev/learning-hebrew-1758491674/learning-hebrew/learning-hebrew:latest
         command: ["bin/rails", "db:migrate"]
         envFrom:
         - configMapRef:
             name: app-config
         env:
         - name: DATABASE_URL
-          value: "postgresql://postgres:your_strong_password@postgres-service:5432/learning_hebrew_production"
-        - name: DATABASE_HOST
-          value: "postgres-service"
-        - name: DATABASE_NAME
-          value: "learning_hebrew_production"
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DATABASE_HOST):5432/$(DATABASE_NAME)"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -43,15 +38,9 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: rails-master-key
-        - name: SECRET_KEY_BASE
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: secret-key-base
       containers:
       - name: rails-app
-        image: learning-hebrew:latest
-        imagePullPolicy: Never
+        image: us-central1-docker.pkg.dev/learning-hebrew-1758491674/learning-hebrew/learning-hebrew:latest
         ports:
         - containerPort: 3000
         envFrom:
@@ -59,11 +48,7 @@ spec:
             name: app-config
         env:
         - name: DATABASE_URL
-          value: "postgresql://postgres:your_strong_password@postgres-service:5432/learning_hebrew_production"
-        - name: DATABASE_HOST
-          value: "postgres-service"
-        - name: DATABASE_NAME
-          value: "learning_hebrew_production"
+          value: "postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@$(DATABASE_HOST):5432/$(DATABASE_NAME)"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -79,11 +64,6 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: rails-master-key
-        - name: SECRET_KEY_BASE
-          valueFrom:
-            secretKeyRef:
-              name: app-secrets
-              key: secret-key-base
         resources:
           requests:
             memory: "256Mi"

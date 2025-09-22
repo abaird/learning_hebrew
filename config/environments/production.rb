@@ -38,6 +38,7 @@ Rails.application.configure do
   # Allow Kubernetes internal IPs
   config.hosts << /10\.21\..*/ # GKE pod IP range
   config.hosts << /34\.118\..*/ # GKE service IP range
+  config.hosts << /10\.244\..*/ # Minikube pod IP range
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
