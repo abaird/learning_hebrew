@@ -41,6 +41,50 @@ docker-compose -f docker-compose.dev.yml up
 docker-compose -f docker-compose.dev.yml exec web bin/rails console
 ```
 
+### Kubernetes Deployment
+
+#### Production (GKE)
+```bash
+# Switch to GKE context
+kubectl config use-context gke_learning-hebrew-1758491674_us-central1_learning-hebrew-cluster
+
+# Deploy to production
+kubectl apply -f k8s/
+
+# Check deployment status
+kubectl get pods -n learning-hebrew
+kubectl get ingress -n learning-hebrew
+
+# View logs
+kubectl logs -f deployment/learning-hebrew-app -n learning-hebrew
+```
+
+#### Local Development (minikube)
+```bash
+# Switch to minikube context
+kubectl config use-context minikube
+
+# Set Docker environment for minikube
+eval $(minikube docker-env)
+
+# Build local image
+docker build -t learning-hebrew:latest .
+
+# Toggle to local images (use script)
+./script/toggle-image.sh
+
+# Deploy to minikube (excluding production secrets)
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/configmap.yaml
+kubectl apply -f k8s/secrets-local.yaml
+kubectl apply -f k8s/postgres.yaml
+kubectl apply -f k8s/rails-app.yaml
+kubectl apply -f k8s/ingress.yaml
+
+# Port forward for local access
+kubectl port-forward service/learning-hebrew-service 8080:80 -n learning-hebrew
+```
+
 ### Testing
 ```bash
 # Run RSpec test suite
@@ -96,12 +140,46 @@ User (1) → Decks (many) → Words (many) → Glosses (many)
 
 ## Development Environment
 
-The application supports both local and Docker development:
+The application supports multiple development approaches:
 
 **Local**: Requires PostgreSQL, Ruby, and Node.js. Uses `bin/dev` to start Rails server and Tailwind CSS watcher.
 
 **Docker**: Complete environment with PostgreSQL container. Database connection configured for container networking (host: `db`).
 
+**Kubernetes**:
+- **Production**: Deployed on Google Kubernetes Engine (GKE) with CI/CD via GitHub Actions
+- **Local**: minikube for testing Kubernetes configurations locally before production deployment
+
+## Deployment Architecture
+
+### Production (GKE)
+- **Cluster**: `learning-hebrew-cluster` in `us-central1`
+- **Registry**: Google Artifact Registry (`us-central1-docker.pkg.dev/learning-hebrew-1758491674/learning-hebrew/learning-hebrew`)
+- **Database**: PostgreSQL with persistent volumes
+- **SSL**: Managed certificates via Google Cloud Load Balancer
+- **CI/CD**: GitHub Actions workflow triggers on main branch push
+
+### Local Testing (minikube)
+- **Purpose**: Test Kubernetes configurations and code changes locally
+- **Images**: Local Docker images with `imagePullPolicy: Never`
+- **Secrets**: Separate local secrets file (gitignored)
+- **Access**: Port forwarding for development testing
+
 ## Authentication
 
-Uses Devise with standard email/password authentication. User registration and authentication routes are automatically generated.
+Uses Devise with custom configurations:
+- **Root route**: `words#index` (vocabulary listing)
+- **Redirects**: Custom `after_sign_in_path_for` and `after_sign_out_path_for`
+- **Host authorization**: Configured for both GKE and minikube IP ranges in production environment
+
+## Recent Updates
+
+### Code Changes
+- Set root route to words index page
+- Added logout functionality with custom redirect
+- Updated host authorization for Kubernetes environments
+
+### Infrastructure
+- Established local minikube development workflow
+- Created toggle script for switching between local/production images
+- Configured separate secrets management for local vs production
