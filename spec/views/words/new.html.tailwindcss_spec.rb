@@ -16,7 +16,6 @@ RSpec.describe "words/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", words_path, "post" do
-
       assert_select "input[name=?]", "word[hebrew]"
 
       assert_select "input[name=?]", "word[part_of_speech]"

@@ -17,7 +17,6 @@ RSpec.describe "decks/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", deck_path(deck), "post" do
-
       assert_select "input[name=?]", "deck[name]"
 
       assert_select "textarea[name=?]", "deck[description]"

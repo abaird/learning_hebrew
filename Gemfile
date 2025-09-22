@@ -43,9 +43,9 @@ gem "thruster", require: false
 # gem "image_processing", "~> 1.2"
 
 # Needed until Ruby 3.3.4 is released https://github.com/ruby/ruby/pull/11006
-gem 'net-pop', github: 'ruby/net-pop'
+gem "net-pop", github: "ruby/net-pop"
 
-gem 'devise'
+gem "devise"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
@@ -57,7 +57,7 @@ group :development, :test do
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
 
-  gem 'rspec-rails'
+  gem "rspec-rails"
 end
 
 group :development do
@@ -71,4 +71,4 @@ group :test do
   gem "selenium-webdriver"
 end
 
-gem "dockerfile-rails", ">= 1.7", :group => :development
+gem "dockerfile-rails", ">= 1.7", group: :development

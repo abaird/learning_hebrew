@@ -13,7 +13,6 @@ RSpec.describe "decks/new", type: :view do
     render
 
     assert_select "form[action=?][method=?]", decks_path, "post" do
-
       assert_select "input[name=?]", "deck[name]"
 
       assert_select "textarea[name=?]", "deck[description]"

@@ -20,7 +20,6 @@ RSpec.describe "words/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", word_path(word), "post" do
-
       assert_select "input[name=?]", "word[hebrew]"
 
       assert_select "input[name=?]", "word[part_of_speech]"

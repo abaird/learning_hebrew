@@ -16,7 +16,6 @@ RSpec.describe "glosses/edit", type: :view do
     render
 
     assert_select "form[action=?][method=?]", gloss_path(gloss), "post" do
-
       assert_select "textarea[name=?]", "gloss[text]"
 
       assert_select "input[name=?]", "gloss[word_id]"
