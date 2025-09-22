@@ -1,7 +1,8 @@
 {
   "permissions": {
     "allow": [
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(kubectl get pods:*)"
     ],
     "deny": [],
     "ask": []
