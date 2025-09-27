@@ -23,11 +23,11 @@ spec:
             name: app-config
         env:
         - name: DATABASE_URL
-          value: "postgresql://postgres:your_strong_password@postgres-service:5432/learning_hebrew_production"
+          value: "postgresql://postgres:your_strong_password@postgres-service:5432/learning_hebrew_development"
         - name: DATABASE_HOST
           value: "postgres-service"
         - name: DATABASE_NAME
-          value: "learning_hebrew_production"
+          value: "learning_hebrew_development"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:
@@ -59,11 +59,11 @@ spec:
             name: app-config
         env:
         - name: DATABASE_URL
-          value: "postgresql://postgres:your_strong_password@postgres-service:5432/learning_hebrew_production"
+          value: "postgresql://postgres:your_strong_password@postgres-service:5432/learning_hebrew_development"
         - name: DATABASE_HOST
           value: "postgres-service"
         - name: DATABASE_NAME
-          value: "learning_hebrew_production"
+          value: "learning_hebrew_development"
         - name: POSTGRES_USER
           valueFrom:
             secretKeyRef:

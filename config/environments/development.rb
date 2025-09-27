@@ -73,5 +73,9 @@ Rails.application.configure do
   # Allow web console access from Docker host IPs
   config.web_console.whitelisted_ips = "172.16.0.0/12"
 
+  # Allow minikube service random ports and localhost access
+  config.hosts << "127.0.0.1"
+  config.hosts << /127\.0\.0\.1:\d+/
+
   config.require_master_key = false
 end
