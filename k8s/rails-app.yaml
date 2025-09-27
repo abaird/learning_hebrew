@@ -48,6 +48,15 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: secret-key-base
+        # Build/deployment info
+        - name: GIT_SHA
+          value: "unknown"
+        - name: BUILD_NUMBER
+          value: "unknown"
+        - name: DEPLOYED_AT
+          value: "unknown"
+        - name: IMAGE_TAG
+          value: "latest"
       containers:
       - name: rails-app
         image: learning-hebrew:latest
@@ -84,6 +93,15 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: secret-key-base
+        # Build/deployment info
+        - name: GIT_SHA
+          value: "unknown"
+        - name: BUILD_NUMBER
+          value: "unknown"
+        - name: DEPLOYED_AT
+          value: "unknown"
+        - name: IMAGE_TAG
+          value: "latest"
         resources:
           requests:
             memory: "256Mi"

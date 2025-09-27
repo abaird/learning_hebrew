@@ -74,6 +74,14 @@ jobs:
 
     - name: Deploy to GKE
       run: |-
+        # Update deployment environment variables with build info
+        kubectl set env deployment/$DEPLOYMENT_NAME \
+          GIT_SHA=$GITHUB_SHA \
+          BUILD_NUMBER=$GITHUB_RUN_NUMBER \
+          DEPLOYED_AT=$(date -u +"%Y-%m-%dT%H:%M:%SZ") \
+          IMAGE_TAG=$GITHUB_SHA \
+          -n learning-hebrew
+
         # Update the image in the deployment
         kubectl set image deployment/$DEPLOYMENT_NAME rails-app=$REGISTRY_LOCATION-docker.pkg.dev/$PROJECT_ID/$IMAGE/$IMAGE:$GITHUB_SHA -n learning-hebrew
         kubectl set image deployment/$DEPLOYMENT_NAME db-migrate=$REGISTRY_LOCATION-docker.pkg.dev/$PROJECT_ID/$IMAGE/$IMAGE:$GITHUB_SHA -n learning-hebrew

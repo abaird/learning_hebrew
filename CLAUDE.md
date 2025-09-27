@@ -43,9 +43,18 @@ docker-compose -f docker-compose.dev.yml exec web bin/rails console
 
 ### Kubernetes Deployment
 
+#### Quick Environment Switching
+```bash
+# Switch to development (minikube) - auto-starts port forwarding
+script/dev.sh
+
+# Switch to production (GKE) - stops port forwarding for safety
+script/prod.sh
+```
+
 #### Production (GKE)
 ```bash
-# Switch to GKE context
+# Manual context switching (or use script/prod.sh)
 kubectl config use-context gke_learning-hebrew-1758491674_us-central1_learning-hebrew-cluster
 
 # Deploy to production
@@ -57,11 +66,14 @@ kubectl get ingress -n learning-hebrew
 
 # View logs
 kubectl logs -f deployment/learning-hebrew-app -n learning-hebrew
+
+# Check deployment info (includes Git SHA, build number, etc.)
+curl https://learning-hebrew.bairdsnet.net/up
 ```
 
 #### Local Development (minikube)
 ```bash
-# Switch to minikube context
+# Manual context switching (or use script/dev.sh)
 kubectl config use-context minikube
 
 # Set Docker environment for minikube
@@ -81,7 +93,7 @@ kubectl apply -f k8s/postgres.yaml
 kubectl apply -f k8s/rails-app.yaml
 kubectl apply -f k8s/ingress.yaml
 
-# Port forward for local access
+# Port forward for local access (or done automatically by script/dev.sh)
 kubectl port-forward service/learning-hebrew-service 8080:80 -n learning-hebrew
 ```
 
@@ -108,6 +120,42 @@ bundle exec rubocop -A
 # Run Brakeman security scanner
 bundle exec brakeman
 ```
+
+## Helper Scripts
+
+The `script/` directory contains convenience scripts for common development tasks:
+
+### Environment Management
+```bash
+# Switch to development environment (minikube + auto port-forward)
+script/dev.sh
+
+# Switch to production environment (GKE - no auto port-forward for safety)
+script/prod.sh
+```
+
+### Deployment Tools
+```bash
+# Open Rails app in browser (auto-starts port forwarding if needed)
+script/open.sh
+
+# Start port forwarding manually
+script/port-forward.sh [port]  # defaults to 3000
+
+# Stop port forwarding
+script/stop-port-forward.sh
+
+# View application logs
+script/logs.sh
+
+# Toggle between local/production Docker images in k8s manifests
+script/toggle-image.sh
+```
+
+### Git Integration
+- **Pre-push hook**: Automatically runs Rubocop before `git push` to prevent CI failures
+- **Override**: Use `git push --no-verify` to skip Rubocop check if needed
+- **Auto-fix suggestion**: Hook provides `bundle exec rubocop -A` command when violations found
 
 ## Architecture
 
@@ -165,6 +213,73 @@ The application supports multiple development approaches:
 - **Secrets**: Separate local secrets file (gitignored)
 - **Access**: Port forwarding for development testing
 
+## Security & Secrets Management
+
+### Google Secret Manager
+All production secrets are stored securely in Google Secret Manager:
+```bash
+# View secrets
+gcloud secrets list
+
+# Get secret value
+gcloud secrets versions access latest --secret="secret-name"
+
+# Update secret (creates new version)
+echo -n "new_value" | gcloud secrets versions add secret-name --data-file=-
+```
+
+**Secrets stored:**
+- `postgres-user`: Database username
+- `postgres-password`: Strong generated database password
+- `rails-master-key`: Rails credentials encryption key
+- `secret-key-base`: Rails session encryption key
+
+**Security Features:**
+- Secrets never stored in git (only placeholders)
+- Automatic injection during CI/CD deployment
+- Separate local secrets for development (gitignored)
+- Free tier usage (4 secrets well within 6/month limit)
+
+### Deployment Diagnostics
+
+Enhanced `/up` health check endpoint provides deployment information:
+
+```bash
+# Check health and deployment info
+curl https://learning-hebrew.bairdsnet.net/up
+
+# Example response:
+{
+  "status": "ok",
+  "timestamp": "2025-09-27T19:06:22Z",
+  "environment": "production",
+  "rails_version": "8.0.2.1",
+  "ruby_version": "3.3.3",
+  "database": {
+    "adapter": "PostgreSQL",
+    "connected": true
+  },
+  "deployment": {
+    "git_sha": "abc123...",          # Actual commit SHA
+    "build_number": "42",            # GitHub Actions run number
+    "deployed_at": "2025-09-27T...", # Deployment timestamp
+    "image_tag": "abc123..."         # Docker image tag
+  }
+}
+```
+
+**Useful diagnostic commands:**
+```bash
+# Get current Git SHA in production
+curl -s https://learning-hebrew.bairdsnet.net/up | jq .deployment.git_sha
+
+# Check database connectivity
+curl -s https://learning-hebrew.bairdsnet.net/up | jq .database.connected
+
+# View environment info
+curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
+```
+
 ## Authentication
 
 Uses Devise with custom configurations:
@@ -174,12 +289,26 @@ Uses Devise with custom configurations:
 
 ## Recent Updates
 
+### Security Enhancements
+- **Google Secret Manager integration**: All production secrets now stored securely
+- **Strong password generation**: Database and encryption keys use cryptographically secure values
+- **Git security**: Removed plain-text secrets from version control
+- **Automated secret injection**: CI/CD pipeline pulls secrets from Google Secret Manager
+
+### Developer Experience
+- **Environment switching scripts**: `script/dev.sh` and `script/prod.sh` for easy context switching
+- **Automatic port forwarding**: Development script auto-starts localhost access
+- **Pre-push Git hooks**: Rubocop runs automatically before push to prevent CI failures
+- **Deployment diagnostics**: Enhanced `/up` endpoint shows Git SHA, build info, and system status
+
+### Infrastructure Improvements
+- **Dual environment support**: Minikube (development) vs GKE (production) with proper separation
+- **Build information tracking**: Git SHA, build numbers, and deployment timestamps in production
+- **Local development optimization**: Faster iteration with automatic Docker builds and port forwarding
+- **Monitoring readiness**: Health endpoints provide detailed deployment and system information
+
 ### Code Changes
 - Set root route to words index page
 - Added logout functionality with custom redirect
 - Updated host authorization for Kubernetes environments
-
-### Infrastructure
-- Established local minikube development workflow
-- Created toggle script for switching between local/production images
-- Configured separate secrets management for local vs production
+- Enhanced health controller with comprehensive system diagnostics
