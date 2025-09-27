@@ -16,5 +16,5 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   root "words#index"
 
-  get '/logout', to: 'sessions#logout'
+  get "/logout", to: "sessions#logout"
 end
