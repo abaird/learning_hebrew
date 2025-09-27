@@ -61,6 +61,17 @@ jobs:
         docker push "$REGISTRY_LOCATION-docker.pkg.dev/$PROJECT_ID/$IMAGE/$IMAGE:$GITHUB_SHA"
         docker push "$REGISTRY_LOCATION-docker.pkg.dev/$PROJECT_ID/$IMAGE/$IMAGE:latest"
 
+    - name: Update Production Secrets
+      run: |-
+        # Create/update secrets from Google Secret Manager
+        kubectl delete secret app-secrets -n learning-hebrew --ignore-not-found=true
+        kubectl create secret generic app-secrets \
+          --from-literal=postgres-user=$(gcloud secrets versions access latest --secret="postgres-user") \
+          --from-literal=postgres-password=$(gcloud secrets versions access latest --secret="postgres-password") \
+          --from-literal=rails-master-key=$(gcloud secrets versions access latest --secret="rails-master-key") \
+          --from-literal=secret-key-base=$(gcloud secrets versions access latest --secret="secret-key-base") \
+          -n learning-hebrew
+
     - name: Deploy to GKE
       run: |-
         # Update the image in the deployment
