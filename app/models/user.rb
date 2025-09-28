@@ -4,4 +4,8 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
   has_many :decks, dependent: :destroy
+
+  def superuser?
+    superuser
+  end
 end

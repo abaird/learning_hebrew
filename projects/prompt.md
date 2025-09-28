@@ -1,140 +1,19 @@
-# Learning Hebrew Rails App - Project Session Summary
+Next Project - better user management.
 
-## Current Status
-This Rails application has been successfully deployed to Google Kubernetes Engine (GKE) with a complete CI/CD pipeline via GitHub Actions. We've also established local development workflows using minikube.
+In this project, we have the following models:
 
-## Architecture Overview
-- **Application**: Ruby on Rails app for learning Hebrew vocabulary
-- **Database**: PostgreSQL running in Kubernetes
-- **Container Registry**: Google Artifact Registry (`us-central1-docker.pkg.dev/learning-hebrew-1758491674/learning-hebrew/learning-hebrew`)
-- **Deployment**: Google Kubernetes Engine (GKE)
-- **CI/CD**: GitHub Actions workflow
-- **Local Development**: minikube with Docker
+Users have Decks...Decks have words...Words have glosses. This was done originally because I was going to create Anki decks for my vocabulary words. However, I want to be able to reuse words between decks, and I don't want words to be dependent on a deck existing. In the new paradigm, here's what I would like the model to look like:
 
-## Recent Code Changes Made
-These changes have been tested locally in minikube but need to be deployed to production:
+Users have Decks...Words has many decks, decks have many words (many to many)
 
-1. **Routing Changes**: Set root route to `words#index` and implemented custom Devise redirects
-2. **Logout Functionality**: Added logout page and `after_sign_out_path_for` redirect
-3. **Host Authorization**: Updated `config/environments/production.rb` to allow both GKE and minikube IP ranges:
-   ```ruby
-   config.hosts << /10\.21\..*/ # GKE pod IP range
-   config.hosts << /34\.118\..*/ # GKE service IP range
-   config.hosts << /10\.244\..*/ # Minikube pod IP range
-   ```
+Words can have many glosses (still the same)
 
-## Key Files and Configurations
+Or, to say it a different way, I want to be able to create words independently of decks and then assign as many words to a deck (or none!) as I want. The idea is that over time, a given user will have an ever expanding vocabulary that he/she adds to over time. Eventually (not now) we will build a custom dictionary based on a deck so that a user can have an interface to look up words that he/she already knows. It will basically be the index page for a deck. We won't build that now, we are just modifying the underlying datastructures to support it in the future.
 
-### Kubernetes Manifests (`k8s/`)
-- `rails-app.yaml`: Main Rails application deployment with PostgreSQL connection
-- `postgres.yaml`: PostgreSQL database with persistent storage
-- `ingress.yaml`: Load balancer with SSL certificate management
-- `secrets.yaml`: Production secrets (base64 encoded)
-- `secrets-local.yaml`: Local development secrets (gitignored)
-- `configmap.yaml`: Environment configuration
+Also, we need to add the idea of a superuser who is the entity that is responsible for adding words to the database (well, probably the words will be added via an import - but we'll get to that later). However, I want to add an admin or superuser user that is always present in the database so that I won't constantly have to adding a user to devise everytime the database re-initializes. I'd like to add that user via a database seed file. You can just make the superuser me (abaird@bairdsnet.net) and setup a password for me. We don't want to commit this to github, so I guess that will need to be a secret that's managed via google secrets. This might be a problem for our Tiltfile setup because in development we don't load secrets from Google Secrets - but I guess the superuser dev password doesn't really need to be a secret. Ha - you can just set the password to secret!.
 
-### Development Tools
-- `script/toggle-image.sh`: Script to toggle between local and production Docker images in k8s manifests
-- `.github/workflows/fly-deploy.yml`: GitHub Actions CI/CD pipeline
+Finally, we need to clean up some of the views in our application. If there is no user logged in, we should load the sign-in page. Also, it would be nice if that page had some styling other than just the barebones style that we currently have. If a user is logged in, it should display the user in the top right hand side. Also, when a user is logged in, there should be links to the decks, words and glosses page. Oh, well, actually, for superuser all 3 of those should be visible. But, for non superuser users, they would only have access to decks (all actions), words (limited to index and show), glosses (limited to index and show). Mabye also there should be a logoff button in the top right as well.
 
-### Local Development Setup
-- **Context Switching**: Use `kubectl config use-context minikube` vs `kubectl config use-context gke_learning-hebrew-1758491674_us-central1_learning-hebrew-cluster`
-- **Image Management**: Local images use `imagePullPolicy: Never`, production uses remote registry
-- **Port Forwarding**: Access local app via `kubectl port-forward` to test before production deployment
+Please use Pundit (ruby gem) for permissions (since I use that at work and am familiar with it already).
 
-## Deployment Workflow
-
-### Production Deployment (Current Need)
-1. Commit recent code changes
-2. Push to GitHub to trigger CI/CD pipeline
-3. Monitor deployment in GKE
-4. Test production application
-
-### Local Development (Established)
-1. Switch to minikube context: `kubectl config use-context minikube`
-2. Set Docker environment: `eval $(minikube docker-env)`
-3. Build local image: `docker build -t learning-hebrew:latest .`
-4. Toggle to local images: `./script/toggle-image.sh`
-5. Deploy: `kubectl apply -f k8s/` (excluding secrets-local.yaml for production)
-6. Port forward: `kubectl port-forward service/learning-hebrew-service 8080:80 -n learning-hebrew`
-
-## Immediate Next Tasks (In Priority Order)
-
-### 1. Deploy Code Changes to Production (IN PROGRESS)
-The recent routing and logout functionality changes need to be deployed to production via the GitHub Actions pipeline.
-
-### 2. Phase 6: Setup learning-hebrew.bairdsnet.net Domain with SSL (PENDING)
-- Update `k8s/ingress.yaml` to use the domain `learning-hebrew.bairdsnet.net`
-- Configure DNS records to point to the GKE load balancer IP
-- Update managed certificate configuration
-- Verify SSL certificate provisioning
-
-### 3. Phase 7: Enable Local Development with Tilt for Fast Iteration (PENDING)
-- Install and configure Tilt for rapid development cycles
-- Set up auto-rebuild and redeploy on code changes
-- Integrate with existing minikube setup
-
-## Security Considerations
-- Production secrets are base64 encoded in `k8s/secrets.yaml`
-- Local secrets are in `k8s/secrets-local.yaml` (gitignored)
-- Rails master key and database credentials are properly managed
-- Host authorization configured for different Kubernetes IP ranges
-
-## Current Application Features
-- User authentication via Devise
-- Word/vocabulary management with CRUD operations
-- Deck organization for vocabulary sets
-- Gloss (translation) management
-- PostgreSQL backend with persistent storage
-- Responsive design with Tailwind CSS
-
-## Troubleshooting Reference
-
-### Common Issues
-- **Image Pull Errors**: Use `imagePullPolicy: Never` for local development
-- **Database Connection**: Ensure PostgreSQL service is running and DATABASE_URL is correct
-- **Host Authorization**: Add appropriate IP ranges to `config.hosts` in production.rb
-- **Context Confusion**: Always verify kubectl context with `kubectl config current-context`
-
-### Useful Commands
-```bash
-# Check current context
-kubectl config current-context
-
-# Switch contexts
-kubectl config use-context minikube
-kubectl config use-context gke_learning-hebrew-1758491674_us-central1_learning-hebrew-cluster
-
-# Check pod status
-kubectl get pods -n learning-hebrew
-
-# Port forward for local access
-kubectl port-forward service/learning-hebrew-service 8080:80 -n learning-hebrew
-
-# Toggle between local/production images
-./script/toggle-image.sh
-
-# Build and set local Docker environment
-eval $(minikube docker-env)
-docker build -t learning-hebrew:latest .
-```
-
-## Next Session Continuation
-The last thing CLAUDE said was:
-
-⏺ Perfect! The push has triggered the GitHub Actions CI/CD pipeline. Let me update the todo list to mark this task as completed and check
-   the deployment status:
-
-⏺ The code changes have been successfully pushed to trigger the production deployment via GitHub Actions. The CI/CD pipeline will now:
-
-  1. Run tests and linting (make a custom check to do linting before pushing so the build won't fail because of stupid Rubocop errors)
-  2. Build the Docker image
-  3. Push to Google Artifact Registry
-  4. Deploy to GKE with the latest code including your routing changes and logout functionality
-
-  You can monitor the deployment progress on GitHub Actions or check the production pods directly. Once deployed, your recent changes
-  (root route to words#index and logout functionality) will be live in production.
-
-  The next phases are ready to proceed when you're ready:
-  - Phase 6: Setup learning-hebrew.bairdsnet.net domain with SSL
-  - Phase 7: Enable local development with Tilt for fast iteration
+Please think deeply on this task and write out the steps suitable for someone (or some AI) to follow later. Put together an implementation plan with steps. Once you are complete, ask for my approval and once I give it, write it out to a file projects/model_improvements.md.

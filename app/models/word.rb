@@ -1,5 +1,6 @@
 class Word < ApplicationRecord
-  belongs_to :deck
+  has_many :deck_words, dependent: :destroy
+  has_many :decks, through: :deck_words
   has_many :glosses, dependent: :destroy
 
   validates :representation, presence: true
