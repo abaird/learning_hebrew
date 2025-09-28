@@ -1,6 +1,6 @@
 class HealthController < ApplicationController
   # Skip authentication for health checks
-  # Note: No authentication required for health endpoints
+  skip_before_action :authenticate_user!
 
   def show
     # Basic health check
