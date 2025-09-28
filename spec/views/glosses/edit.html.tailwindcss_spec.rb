@@ -1,12 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe "glosses/edit", type: :view do
-  let(:gloss) {
-    Gloss.create!(
-      text: "MyText",
-      word: nil
-    )
-  }
+  fixtures :users, :decks, :words, :glosses
+  let(:gloss) { glosses(:shalom_peace) }
 
   before(:each) do
     assign(:gloss, gloss)

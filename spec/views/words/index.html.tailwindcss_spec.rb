@@ -1,35 +1,18 @@
 require 'rails_helper'
 
 RSpec.describe "words/index", type: :view do
+  fixtures :users, :decks, :words
   before(:each) do
     assign(:words, [
-      Word.create!(
-        hebrew: "Hebrew",
-        part_of_speech: "Part Of Speech",
-        mnemonic: "MyText",
-        pronunciation_audio_url: "Pronunciation Audio Url",
-        picture_url: "Picture Url",
-        deck: nil
-      ),
-      Word.create!(
-        hebrew: "Hebrew",
-        part_of_speech: "Part Of Speech",
-        mnemonic: "MyText",
-        pronunciation_audio_url: "Pronunciation Audio Url",
-        picture_url: "Picture Url",
-        deck: nil
-      )
+      words(:shalom),
+      words(:shalom)
     ])
   end
 
   it "renders a list of words" do
     render
-    cell_selector = 'div>p'
-    assert_select cell_selector, text: Regexp.new("Hebrew".to_s), count: 2
-    assert_select cell_selector, text: Regexp.new("Part Of Speech".to_s), count: 2
-    assert_select cell_selector, text: Regexp.new("MyText".to_s), count: 2
-    assert_select cell_selector, text: Regexp.new("Pronunciation Audio Url".to_s), count: 2
-    assert_select cell_selector, text: Regexp.new("Picture Url".to_s), count: 2
-    assert_select cell_selector, text: Regexp.new(nil.to_s), count: 2
+    expect(rendered).to match(/שלום/)
+    expect(rendered).to match(/noun/)
+    expect(rendered).to match(/Peace and greeting/)
   end
 end

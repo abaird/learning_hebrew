@@ -1,5 +1,5 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-require 'spec_helper'
+# require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require_relative '../config/environment'
 # Prevent database truncation if the environment is production
@@ -23,7 +23,7 @@ require 'rspec/rails'
 # directory. Alternatively, in the individual `*_spec.rb` files, manually
 # require only the support files necessary.
 #
-# Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
+Rails.root.glob('spec/support/**/*.rb').sort_by(&:to_s).each { |f| require f }
 
 # Checks for pending migrations and applies them before tests are run.
 # If you are not using ActiveRecord, you can remove these lines.
@@ -33,6 +33,17 @@ rescue ActiveRecord::PendingMigrationError => e
   abort e.to_s.strip
 end
 RSpec.configure do |config|
+  # DO NOT REMOVE: There is a bug in Devise with Rails 8.0 that requires these lines
+  # (IntegrationHelpers and reload_routes_unless_loaded) to be present to pass.
+  # see: https://github.com/heartcombo/devise/issues/5705#issuecomment-2659521001
+  config.include Devise::Test::IntegrationHelpers, type: :request
+  config.before(:each, type: :request) do
+    Rails.application.reload_routes_unless_loaded
+  end
+
+  # Include route helpers for request specs
+  # config.include Rails.application.routes.url_helpers
+
   # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
   config.fixture_paths = [
     Rails.root.join('spec/fixtures')

@@ -3,8 +3,7 @@ require 'rails_helper'
 RSpec.describe "glosses/new", type: :view do
   before(:each) do
     assign(:gloss, Gloss.new(
-      text: "MyText",
-      word: nil
+      text: "MyText"
     ))
   end
 

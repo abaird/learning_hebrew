@@ -1,0 +1,36 @@
+# Test gloss fixtures
+shalom_peace:
+  text: "peace"
+  word: shalom
+  created_at: <%= 1.day.ago %>
+  updated_at: <%= 1.day.ago %>
+
+shalom_hello:
+  text: "hello"
+  word: shalom
+  created_at: <%= 1.day.ago %>
+  updated_at: <%= 1.day.ago %>
+
+toda_thanks:
+  text: "thank you"
+  word: toda
+  created_at: <%= 1.day.ago %>
+  updated_at: <%= 1.day.ago %>
+
+toda_thanks_alt:
+  text: "thanks"
+  word: toda
+  created_at: <%= 1.day.ago %>
+  updated_at: <%= 1.day.ago %>
+
+bayit_house:
+  text: "house"
+  word: bayit
+  created_at: <%= 2.days.ago %>
+  updated_at: <%= 2.days.ago %>
+
+bayit_home:
+  text: "home"
+  word: bayit
+  created_at: <%= 2.days.ago %>
+  updated_at: <%= 2.days.ago %>

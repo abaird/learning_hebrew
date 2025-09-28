@@ -4,8 +4,7 @@ RSpec.describe "decks/new", type: :view do
   before(:each) do
     assign(:deck, Deck.new(
       name: "MyString",
-      description: "MyText",
-      user: nil
+      description: "MyText"
     ))
   end
 

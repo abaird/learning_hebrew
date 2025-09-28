@@ -13,16 +13,32 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe "/decks", type: :request do
+  fixtures :users, :decks
   # This should return the minimal set of attributes required to create a valid
   # Deck. As you add validations to Deck, be sure to
   # adjust the attributes here as well.
+  let(:user) { User.create!(email: "deck_test_#{rand(10000)}@example.com", password: "password123", password_confirmation: "password123") }
+
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
+    {
+      name: "Test Deck",
+      description: "A test deck for Hebrew words",
+      user_id: user.id
+    }
   }
 
   let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    {
+      name: "",  # Invalid because name is required
+      description: "A test deck",
+      user_id: user.id
+    }
   }
+
+  before do
+    # Sign in user for authenticated requests
+    sign_in user
+  end
 
   describe "GET /index" do
     it "renders a successful response" do

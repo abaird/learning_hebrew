@@ -1,0 +1,30 @@
+# Test word fixtures
+shalom:
+  representation: "שלום"
+  part_of_speech: "noun"
+  mnemonic: "Peace and greeting"
+  pronunciation_url: "https://example.com/shalom.mp3"
+  picture_url: "https://example.com/peace.jpg"
+  deck: basic_deck
+  created_at: <%= 1.day.ago %>
+  updated_at: <%= 1.day.ago %>
+
+toda:
+  representation: "תודה"
+  part_of_speech: "noun"
+  mnemonic: "Thank you"
+  pronunciation_url: "https://example.com/toda.mp3"
+  picture_url: "https://example.com/thanks.jpg"
+  deck: basic_deck
+  created_at: <%= 1.day.ago %>
+  updated_at: <%= 1.day.ago %>
+
+bayit:
+  representation: "בית"
+  part_of_speech: "noun"
+  mnemonic: "House or home"
+  pronunciation_url: "https://example.com/bayit.mp3"
+  picture_url: "https://example.com/house.jpg"
+  deck: advanced_deck
+  created_at: <%= 2.days.ago %>
+  updated_at: <%= 2.days.ago %>

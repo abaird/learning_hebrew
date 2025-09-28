@@ -13,16 +13,31 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe "/glosses", type: :request do
+  fixtures :users, :decks, :words, :glosses
   # This should return the minimal set of attributes required to create a valid
   # Gloss. As you add validations to Gloss, be sure to
   # adjust the attributes here as well.
+  let(:user) { User.create!(email: "gloss_test_#{rand(10000)}@example.com", password: "password123", password_confirmation: "password123") }
+  let(:word) { words(:shalom) }
+
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
+    {
+      text: "peace",
+      word_id: word.id
+    }
   }
 
   let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    {
+      text: "",  # Invalid because text is required
+      word_id: word.id
+    }
   }
+
+  before do
+    # Sign in user for authenticated requests
+    sign_in user
+  end
 
   describe "GET /index" do
     it "renders a successful response" do

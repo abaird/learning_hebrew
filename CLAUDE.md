@@ -98,8 +98,26 @@ kubectl port-forward service/learning-hebrew-service 8080:80 -n learning-hebrew
 ```
 
 ### Testing
+
+#### Local Testing (Minikube)
 ```bash
-# Run RSpec test suite
+# Run all tests in proper test environment (minikube)
+script/test.sh
+
+# Run specific test files
+script/test.sh spec/requests/decks_spec.rb
+
+# Run with RSpec options
+script/test.sh --format documentation
+
+# Manual testing setup (if needed)
+kubectl exec deployment/learning-hebrew-app -n learning-hebrew -- \
+  env RAILS_ENV=test DATABASE_URL="postgresql://..." bundle exec rspec
+```
+
+#### Local Testing (Traditional)
+```bash
+# Run RSpec test suite (requires local PostgreSQL)
 bundle exec rspec
 
 # Run specific test file
@@ -108,6 +126,12 @@ bundle exec rspec spec/models/user_spec.rb
 # Run with coverage
 bundle exec rspec --format documentation
 ```
+
+**Note**: The `script/test.sh` approach is recommended as it:
+- Runs tests in proper `test` environment (not development)
+- Uses separate `learning_hebrew_test` database
+- Provides test data isolation from development work
+- Automatically handles database setup and cleanup
 
 ### Code Quality
 ```bash
@@ -152,6 +176,18 @@ script/logs.sh
 script/toggle-image.sh
 ```
 
+### Testing Tools
+```bash
+# Run tests in minikube test environment (recommended)
+script/test.sh
+
+# Run specific test files
+script/test.sh spec/requests/decks_spec.rb
+
+# Run tests with RSpec options
+script/test.sh --format documentation --color
+```
+
 ### Git Integration
 - **Pre-push hook**: Automatically runs Rubocop before `git push` to prevent CI failures
 - **Override**: Use `git push --no-verify` to skip Rubocop check if needed
@@ -164,6 +200,13 @@ script/toggle-image.sh
 - **decks**: Named collections belonging to users (name, description, user_id)
 - **words**: Hebrew vocabulary items (representation, part_of_speech, mnemonic, pronunciation_url, picture_url, deck_id)
 - **glosses**: Translation definitions (text, word_id)
+
+### Database Configuration
+- **Development**: `learning_hebrew_development` - for local development work
+- **Test**: `learning_hebrew_test` - isolated test environment with automatic cleanup
+- **Production**: `learning_hebrew_production` - production data with strong security
+- **Host Detection**: Automatically uses `localhost` for local development, `db` for containerized environments
+- **Environment Variables**: `DATABASE_HOST` and `DATABASE_URL` control connection settings
 
 ### Model Relationships
 ```
@@ -197,6 +240,7 @@ The application supports multiple development approaches:
 **Kubernetes**:
 - **Production**: Deployed on Google Kubernetes Engine (GKE) with CI/CD via GitHub Actions
 - **Local**: minikube for testing Kubernetes configurations locally before production deployment
+- **Testing**: Separate test database (`learning_hebrew_test`) with proper environment isolation
 
 ## Deployment Architecture
 
@@ -300,6 +344,8 @@ Uses Devise with custom configurations:
 - **Automatic port forwarding**: Development script auto-starts localhost access
 - **Pre-push Git hooks**: Rubocop runs automatically before push to prevent CI failures
 - **Deployment diagnostics**: Enhanced `/up` endpoint shows Git SHA, build info, and system status
+- **Test environment isolation**: `script/test.sh` runs tests in proper test environment with separate database
+- **Database configuration**: Smart host detection for local vs containerized environments
 
 ### Infrastructure Improvements
 - **Dual environment support**: Minikube (development) vs GKE (production) with proper separation

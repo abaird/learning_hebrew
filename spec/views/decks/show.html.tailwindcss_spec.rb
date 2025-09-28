@@ -1,18 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe "decks/show", type: :view do
+  fixtures :users, :decks
   before(:each) do
-    assign(:deck, Deck.create!(
-      name: "Name",
-      description: "MyText",
-      user: nil
-    ))
+    assign(:deck, decks(:basic_deck))
   end
 
   it "renders attributes in <p>" do
     render
-    expect(rendered).to match(/Name/)
-    expect(rendered).to match(/MyText/)
-    expect(rendered).to match(//)
+    expect(rendered).to match(/Basic Hebrew Words/)
+    expect(rendered).to match(/A collection of basic Hebrew vocabulary/)
   end
 end

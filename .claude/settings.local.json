@@ -8,7 +8,13 @@
       "Bash(curl:*)",
       "Bash(docker buildx build:*)",
       "Bash(kubectl rollout restart:*)",
-      "Bash(kubectl describe:*)"
+      "Bash(kubectl describe:*)",
+      "Bash(script/test.sh:*)",
+      "Bash(bundle exec rspec:*)",
+      "Bash(kubectl wait:*)",
+      "Bash(minikube stop:*)",
+      "Bash(kubectl get secret:*)",
+      "Bash(kubectl get:*)"
     ],
     "deny": [],
     "ask": []

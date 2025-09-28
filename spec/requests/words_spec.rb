@@ -13,16 +13,36 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe "/words", type: :request do
+  fixtures :users, :decks, :words
   # This should return the minimal set of attributes required to create a valid
   # Word. As you add validations to Word, be sure to
   # adjust the attributes here as well.
+  let(:user) { users(:test_user) }
+  let(:deck) { decks(:basic_deck) }
+
   let(:valid_attributes) {
-    skip("Add a hash of attributes valid for your model")
+    {
+      representation: "שלום",
+      part_of_speech: "noun",
+      mnemonic: "Peace and greeting",
+      pronunciation_url: "https://example.com/shalom.mp3",
+      picture_url: "https://example.com/peace.jpg",
+      deck_id: deck.id
+    }
   }
 
   let(:invalid_attributes) {
-    skip("Add a hash of attributes invalid for your model")
+    {
+      representation: "",  # Invalid because representation is required
+      part_of_speech: "",  # Invalid because part_of_speech is required
+      deck_id: deck.id
+    }
   }
+
+  before do
+    # Sign in user for authenticated requests
+    sign_in user
+  end
 
   describe "GET /index" do
     it "renders a successful response" do

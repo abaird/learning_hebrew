@@ -20,7 +20,8 @@ default: &default
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   username: postgres
   password: password
-  host: db
+  # Use localhost for local development, 'db' for containerized environments
+  host: <%= ENV.fetch("DATABASE_HOST") { "localhost" } %>
 
 
 development:

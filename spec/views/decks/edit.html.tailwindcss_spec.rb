@@ -1,13 +1,9 @@
 require 'rails_helper'
 
 RSpec.describe "decks/edit", type: :view do
-  let(:deck) {
-    Deck.create!(
-      name: "MyString",
-      description: "MyText",
-      user: nil
-    )
-  }
+  fixtures :users, :decks
+
+  let(:deck) { decks(:basic_deck) }
 
   before(:each) do
     assign(:deck, deck)
