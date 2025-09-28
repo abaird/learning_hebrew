@@ -39,3 +39,7 @@
 # Ignore port-forward PID file
 .port-forward.pid
 k8s/secrets-local.yaml
+
+# Tilt
+.tiltbuild/
+tilt_modules/

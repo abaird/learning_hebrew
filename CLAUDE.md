@@ -333,6 +333,23 @@ Uses Devise with custom configurations:
 
 ## Recent Updates
 
+### Tilt Integration for Fast Development
+- **Installed Tilt v0.35.1**: Fast Kubernetes development workflow with live updates
+- **Created development Docker image**: `Dockerfile.dev` optimized for development with proper user permissions
+- **Implemented live code syncing**: Changes to Ruby files, views, and assets sync without rebuilds
+- **Added manual database reset**: `db-reset` resource in Tilt UI for development database management
+- **Fixed permission issues**: Container runs as `rails` user with proper write access for live updates
+- **Tilt commands**:
+  - `script/tilt-start.sh` - Start Tilt with minikube environment setup
+  - `script/tilt-down.sh` - Properly stop Tilt services
+  - `script/tilt.sh` - Tilt starter with environment checks
+- **Live update triggers**:
+  - Code changes (`app/`, `lib/`, `spec/`) sync instantly
+  - Gemfile changes trigger `bundle install`
+  - Asset changes trigger recompilation
+  - Critical config changes trigger full rebuilds
+- **Manual triggers**: Database reset available in Tilt UI (manual trigger only)
+
 ### GitHub Actions CI/CD Improvements
 - **Enhanced deployment debugging**: Added comprehensive logging and error handling to GitHub Actions workflow
 - **Fixed service account permissions**: GitHub Actions service account now has proper Secret Manager access

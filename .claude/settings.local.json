@@ -14,7 +14,12 @@
       "Bash(kubectl wait:*)",
       "Bash(minikube stop:*)",
       "Bash(kubectl get secret:*)",
-      "Bash(kubectl get:*)"
+      "Bash(kubectl get:*)",
+      "WebFetch(domain:docs.tilt.dev)",
+      "Bash(tilt:*)",
+      "Bash(brew search:*)",
+      "Bash(env)",
+      "Bash(minikube:*)"
     ],
     "deny": [],
     "ask": []
