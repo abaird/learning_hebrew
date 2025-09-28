@@ -34,8 +34,8 @@ kubectl exec deployment/learning-hebrew-app -n learning-hebrew -- \
     bundle exec rails db:create db:schema:load
 
 echo "🏃 Running RSpec tests..."
-kubectl exec deployment/learning-hebrew-app -n learning-hebrew -- \
-    env RAILS_ENV=test DATABASE_URL="$TEST_DATABASE_URL" \
+kubectl exec -it deployment/learning-hebrew-app -n learning-hebrew -- \
+    env RAILS_ENV=test DATABASE_URL="$TEST_DATABASE_URL" FORCE_COLOR=1 \
     bundle exec rspec "$@"
 
 echo "✅ Tests completed!"

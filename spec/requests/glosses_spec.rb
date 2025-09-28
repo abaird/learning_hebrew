@@ -93,7 +93,7 @@ RSpec.describe "/glosses", type: :request do
 
       it "renders a response with 422 status (i.e. to display the 'new' template)" do
         post glosses_url, params: { gloss: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
@@ -123,7 +123,7 @@ RSpec.describe "/glosses", type: :request do
       it "renders a response with 422 status (i.e. to display the 'edit' template)" do
         gloss = Gloss.create! valid_attributes
         patch gloss_url(gloss), params: { gloss: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
