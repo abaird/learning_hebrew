@@ -28,8 +28,8 @@ class HealthController < ApplicationController
 
     respond_to do |format|
       format.json { render json: build_info }
-      format.html { render json: build_info, layout: false }
-      format.any { render json: build_info }
+      format.html { render json: build_info, content_type: "application/json" }
+      format.any { render json: build_info, content_type: "application/json" }
     end
   rescue => e
     error_info = {
@@ -41,8 +41,8 @@ class HealthController < ApplicationController
 
     respond_to do |format|
       format.json { render json: error_info, status: :service_unavailable }
-      format.html { render json: error_info, status: :service_unavailable, layout: false }
-      format.any { render json: error_info, status: :service_unavailable }
+      format.html { render json: error_info, status: :service_unavailable, content_type: "application/json" }
+      format.any { render json: error_info, status: :service_unavailable, content_type: "application/json" }
     end
   end
 end
