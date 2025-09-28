@@ -64,17 +64,44 @@ jobs:
     - name: Update Production Secrets
       run: |-
         # Create/update secrets from Google Secret Manager
+        echo "🔐 Updating production secrets from Google Secret Manager..."
+
+        # Test access to secrets first
+        echo "🧪 Testing secret access..."
+        if ! gcloud secrets versions access latest --secret="postgres-user" > /dev/null 2>&1; then
+          echo "❌ Cannot access postgres-user secret"
+          gcloud secrets versions access latest --secret="postgres-user" || true
+          exit 1
+        fi
+
+        # Delete existing secrets
+        echo "🗑️  Deleting existing secrets..."
         kubectl delete secret app-secrets -n learning-hebrew --ignore-not-found=true
+
+        # Create new secrets with error handling
+        echo "🔑 Creating new secrets..."
+        POSTGRES_USER=$(gcloud secrets versions access latest --secret="postgres-user")
+        POSTGRES_PASSWORD=$(gcloud secrets versions access latest --secret="postgres-password")
+        RAILS_MASTER_KEY=$(gcloud secrets versions access latest --secret="rails-master-key")
+        SECRET_KEY_BASE=$(gcloud secrets versions access latest --secret="secret-key-base")
+
+        echo "✅ Retrieved all secrets successfully"
+
         kubectl create secret generic app-secrets \
-          --from-literal=postgres-user=$(gcloud secrets versions access latest --secret="postgres-user") \
-          --from-literal=postgres-password=$(gcloud secrets versions access latest --secret="postgres-password") \
-          --from-literal=rails-master-key=$(gcloud secrets versions access latest --secret="rails-master-key") \
-          --from-literal=secret-key-base=$(gcloud secrets versions access latest --secret="secret-key-base") \
+          --from-literal=postgres-user="$POSTGRES_USER" \
+          --from-literal=postgres-password="$POSTGRES_PASSWORD" \
+          --from-literal=rails-master-key="$RAILS_MASTER_KEY" \
+          --from-literal=secret-key-base="$SECRET_KEY_BASE" \
           -n learning-hebrew
+
+        # Verify secret creation
+        echo "🔍 Verifying secret creation..."
+        kubectl describe secret app-secrets -n learning-hebrew
 
     - name: Deploy to GKE
       run: |-
         # Update deployment environment variables with build info
+        echo "🔧 Updating deployment environment variables..."
         kubectl set env deployment/$DEPLOYMENT_NAME \
           GIT_SHA=$GITHUB_SHA \
           BUILD_NUMBER=$GITHUB_RUN_NUMBER \
@@ -83,7 +110,15 @@ jobs:
           -n learning-hebrew
 
         # Update the image in the deployment
+        echo "🐳 Updating container images..."
         kubectl set image deployment/$DEPLOYMENT_NAME rails-app=$REGISTRY_LOCATION-docker.pkg.dev/$PROJECT_ID/$IMAGE/$IMAGE:$GITHUB_SHA -n learning-hebrew
         kubectl set image deployment/$DEPLOYMENT_NAME db-migrate=$REGISTRY_LOCATION-docker.pkg.dev/$PROJECT_ID/$IMAGE/$IMAGE:$GITHUB_SHA -n learning-hebrew
-        kubectl rollout status deployment/$DEPLOYMENT_NAME -n learning-hebrew
+
+        # Wait for rollout with timeout
+        echo "⏳ Waiting for deployment rollout (max 10 minutes)..."
+        kubectl rollout status deployment/$DEPLOYMENT_NAME -n learning-hebrew --timeout=600s
+
+        # Show final status
+        echo "✅ Deployment completed! Current status:"
+        kubectl get pods -n learning-hebrew
         kubectl get services -o wide -n learning-hebrew

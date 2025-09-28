@@ -333,6 +333,14 @@ Uses Devise with custom configurations:
 
 ## Recent Updates
 
+### GitHub Actions CI/CD Improvements
+- **Enhanced deployment debugging**: Added comprehensive logging and error handling to GitHub Actions workflow
+- **Fixed service account permissions**: GitHub Actions service account now has proper Secret Manager access
+- **Added deployment timeouts**: Prevents infinite hangs during deployment rollouts
+- **Improved secret management**: Better error handling when retrieving secrets from Google Secret Manager
+
+## Previous Updates
+
 ### Security Enhancements
 - **Google Secret Manager integration**: All production secrets now stored securely
 - **Strong password generation**: Database and encryption keys use cryptographically secure values
