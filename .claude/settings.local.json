@@ -19,7 +19,13 @@
       "Bash(tilt:*)",
       "Bash(brew search:*)",
       "Bash(env)",
-      "Bash(minikube:*)"
+      "Bash(minikube:*)",
+      "Bash(bin/rails generate migration:*)",
+      "Bash(kubectl exec:*)",
+      "Bash(kubectl apply:*)",
+      "Bash(kubectl rollout status:*)",
+      "Bash(docker-compose:*)",
+      "Bash(kubectl config:*)"
     ],
     "deny": [],
     "ask": []

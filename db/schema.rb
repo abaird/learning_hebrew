@@ -10,9 +10,19 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_10_022754) do
+ActiveRecord::Schema[8.0].define(version: 2025_09_28_213405) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
+
+  create_table "deck_words", force: :cascade do |t|
+    t.bigint "deck_id", null: false
+    t.bigint "word_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["deck_id", "word_id"], name: "index_deck_words_on_deck_id_and_word_id", unique: true
+    t.index ["deck_id"], name: "index_deck_words_on_deck_id"
+    t.index ["word_id"], name: "index_deck_words_on_word_id"
+  end
 
   create_table "decks", force: :cascade do |t|
     t.string "name", null: false
@@ -40,6 +50,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_022754) do
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
+    t.boolean "superuser", default: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -50,13 +61,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_10_022754) do
     t.text "mnemonic"
     t.string "pronunciation_url"
     t.string "picture_url"
-    t.bigint "deck_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["deck_id"], name: "index_words_on_deck_id"
   end
 
+  add_foreign_key "deck_words", "decks"
+  add_foreign_key "deck_words", "words"
   add_foreign_key "decks", "users"
   add_foreign_key "glosses", "words"
-  add_foreign_key "words", "decks"
 end

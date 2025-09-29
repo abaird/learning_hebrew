@@ -3,25 +3,30 @@ class DecksController < ApplicationController
 
   # GET /decks or /decks.json
   def index
+    authorize Deck
     @decks = Deck.all
   end
 
   # GET /decks/1 or /decks/1.json
   def show
+    authorize @deck
   end
 
   # GET /decks/new
   def new
     @deck = Deck.new
+    authorize @deck
   end
 
   # GET /decks/1/edit
   def edit
+    authorize @deck
   end
 
   # POST /decks or /decks.json
   def create
     @deck = Deck.new(deck_params)
+    authorize @deck
 
     respond_to do |format|
       if @deck.save
@@ -36,6 +41,7 @@ class DecksController < ApplicationController
 
   # PATCH/PUT /decks/1 or /decks/1.json
   def update
+    authorize @deck
     respond_to do |format|
       if @deck.update(deck_params)
         format.html { redirect_to @deck, notice: "Deck was successfully updated." }
@@ -49,6 +55,7 @@ class DecksController < ApplicationController
 
   # DELETE /decks/1 or /decks/1.json
   def destroy
+    authorize @deck
     @deck.destroy!
 
     respond_to do |format|

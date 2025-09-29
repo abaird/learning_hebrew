@@ -3,25 +3,30 @@ class WordsController < ApplicationController
 
   # GET /words or /words.json
   def index
+    authorize Word
     @words = Word.all
   end
 
   # GET /words/1 or /words/1.json
   def show
+    authorize @word
   end
 
   # GET /words/new
   def new
     @word = Word.new
+    authorize @word
   end
 
   # GET /words/1/edit
   def edit
+    authorize @word
   end
 
   # POST /words or /words.json
   def create
     @word = Word.new(word_params)
+    authorize @word
 
     respond_to do |format|
       if @word.save
@@ -36,6 +41,7 @@ class WordsController < ApplicationController
 
   # PATCH/PUT /words/1 or /words/1.json
   def update
+    authorize @word
     respond_to do |format|
       if @word.update(word_params)
         format.html { redirect_to @word, notice: "Word was successfully updated." }
@@ -49,6 +55,7 @@ class WordsController < ApplicationController
 
   # DELETE /words/1 or /words/1.json
   def destroy
+    authorize @word
     @word.destroy!
 
     respond_to do |format|

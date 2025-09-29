@@ -61,7 +61,7 @@ development:
 test:
   <<: *default
   database: learning_hebrew_test
-  url: <%= ENV["DATABASE_URL"] %>
+  # Don't use DATABASE_URL in test environment to avoid conflicts with development
 
 # As with config/credentials.yml, you never want to store sensitive information,
 # like your database password, in your source code. If your source code is

@@ -3,25 +3,30 @@ class GlossesController < ApplicationController
 
   # GET /glosses or /glosses.json
   def index
+    authorize Gloss
     @glosses = Gloss.all
   end
 
   # GET /glosses/1 or /glosses/1.json
   def show
+    authorize @gloss
   end
 
   # GET /glosses/new
   def new
     @gloss = Gloss.new
+    authorize @gloss
   end
 
   # GET /glosses/1/edit
   def edit
+    authorize @gloss
   end
 
   # POST /glosses or /glosses.json
   def create
     @gloss = Gloss.new(gloss_params)
+    authorize @gloss
 
     respond_to do |format|
       if @gloss.save
@@ -36,6 +41,7 @@ class GlossesController < ApplicationController
 
   # PATCH/PUT /glosses/1 or /glosses/1.json
   def update
+    authorize @gloss
     respond_to do |format|
       if @gloss.update(gloss_params)
         format.html { redirect_to @gloss, notice: "Gloss was successfully updated." }
@@ -49,6 +55,7 @@ class GlossesController < ApplicationController
 
   # DELETE /glosses/1 or /glosses/1.json
   def destroy
+    authorize @gloss
     @gloss.destroy!
 
     respond_to do |format|

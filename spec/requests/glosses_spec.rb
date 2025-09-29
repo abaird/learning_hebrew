@@ -17,7 +17,8 @@ RSpec.describe "/glosses", type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Gloss. As you add validations to Gloss, be sure to
   # adjust the attributes here as well.
-  let(:user) { User.create!(email: "gloss_test_#{rand(10000)}@example.com", password: "password123", password_confirmation: "password123") }
+  let(:regular_user) { users(:test_user) }
+  let(:superuser_account) { users(:superuser) }
   let(:word) { words(:shalom) }
 
   let(:valid_attributes) {
@@ -34,112 +35,169 @@ RSpec.describe "/glosses", type: :request do
     }
   }
 
-  before do
-    # Sign in user for authenticated requests
-    sign_in user
-  end
+  # Tests that work for both regular users and superusers
+  shared_examples "accessible to all authenticated users" do
+    describe "GET /index" do
+      it "renders a successful response" do
+        Gloss.create! valid_attributes
+        get glosses_url
+        expect(response).to be_successful
+      end
+    end
 
-  describe "GET /index" do
-    it "renders a successful response" do
-      Gloss.create! valid_attributes
-      get glosses_url
-      expect(response).to be_successful
+    describe "GET /show" do
+      it "renders a successful response" do
+        gloss = Gloss.create! valid_attributes
+        get gloss_url(gloss)
+        expect(response).to be_successful
+      end
     end
   end
 
-  describe "GET /show" do
-    it "renders a successful response" do
-      gloss = Gloss.create! valid_attributes
-      get gloss_url(gloss)
-      expect(response).to be_successful
-    end
-  end
+  context "as a regular user" do
+    before { sign_in regular_user }
 
-  describe "GET /new" do
-    it "renders a successful response" do
-      get new_gloss_url
-      expect(response).to be_successful
-    end
-  end
+    include_examples "accessible to all authenticated users"
 
-  describe "GET /edit" do
-    it "renders a successful response" do
-      gloss = Gloss.create! valid_attributes
-      get edit_gloss_url(gloss)
-      expect(response).to be_successful
+    describe "GET /new" do
+      it "redirects to root with authorization error" do
+        get new_gloss_url
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
+      end
     end
-  end
 
-  describe "POST /create" do
-    context "with valid parameters" do
-      it "creates a new Gloss" do
+    describe "GET /edit" do
+      it "redirects to root with authorization error" do
+        gloss = Gloss.create! valid_attributes
+        get edit_gloss_url(gloss)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
+      end
+    end
+
+    describe "POST /create" do
+      it "redirects to root with authorization error" do
         expect {
           post glosses_url, params: { gloss: valid_attributes }
-        }.to change(Gloss, :count).by(1)
-      end
-
-      it "redirects to the created gloss" do
-        post glosses_url, params: { gloss: valid_attributes }
-        expect(response).to redirect_to(gloss_url(Gloss.last))
-      end
-    end
-
-    context "with invalid parameters" do
-      it "does not create a new Gloss" do
-        expect {
-          post glosses_url, params: { gloss: invalid_attributes }
         }.to change(Gloss, :count).by(0)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
       end
+    end
 
-      it "renders a response with 422 status (i.e. to display the 'new' template)" do
-        post glosses_url, params: { gloss: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_content)
+    describe "PATCH /update" do
+      it "redirects to root with authorization error" do
+        gloss = Gloss.create! valid_attributes
+        patch gloss_url(gloss), params: { gloss: { text: "tranquility" } }
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
+      end
+    end
+
+    describe "DELETE /destroy" do
+      it "redirects to root with authorization error" do
+        gloss = Gloss.create! valid_attributes
+        expect {
+          delete gloss_url(gloss)
+        }.to change(Gloss, :count).by(0)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
       end
     end
   end
 
-  describe "PATCH /update" do
-    context "with valid parameters" do
-      let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
-      }
+  context "as a superuser" do
+    before { sign_in superuser_account }
 
-      it "updates the requested gloss" do
-        gloss = Gloss.create! valid_attributes
-        patch gloss_url(gloss), params: { gloss: new_attributes }
-        gloss.reload
-        skip("Add assertions for updated state")
-      end
+    include_examples "accessible to all authenticated users"
 
-      it "redirects to the gloss" do
-        gloss = Gloss.create! valid_attributes
-        patch gloss_url(gloss), params: { gloss: new_attributes }
-        gloss.reload
-        expect(response).to redirect_to(gloss_url(gloss))
+    describe "GET /new" do
+      it "renders a successful response" do
+        get new_gloss_url
+        expect(response).to be_successful
       end
     end
 
-    context "with invalid parameters" do
-      it "renders a response with 422 status (i.e. to display the 'edit' template)" do
+    describe "GET /edit" do
+      it "renders a successful response" do
         gloss = Gloss.create! valid_attributes
-        patch gloss_url(gloss), params: { gloss: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_content)
+        get edit_gloss_url(gloss)
+        expect(response).to be_successful
       end
     end
-  end
 
-  describe "DELETE /destroy" do
-    it "destroys the requested gloss" do
-      gloss = Gloss.create! valid_attributes
-      expect {
+    describe "POST /create" do
+      context "with valid parameters" do
+        it "creates a new Gloss" do
+          expect {
+            post glosses_url, params: { gloss: valid_attributes }
+          }.to change(Gloss, :count).by(1)
+        end
+
+        it "redirects to the created gloss" do
+          post glosses_url, params: { gloss: valid_attributes }
+          expect(response).to redirect_to(gloss_url(Gloss.last))
+        end
+      end
+
+      context "with invalid parameters" do
+        it "does not create a new Gloss" do
+          expect {
+            post glosses_url, params: { gloss: invalid_attributes }
+          }.to change(Gloss, :count).by(0)
+        end
+
+        it "renders a response with 422 status (i.e. to display the 'new' template)" do
+          post glosses_url, params: { gloss: invalid_attributes }
+          expect(response).to have_http_status(:unprocessable_content)
+        end
+      end
+    end
+
+    describe "PATCH /update" do
+      context "with valid parameters" do
+        let(:new_attributes) {
+          { text: "tranquility" }
+        }
+
+        it "updates the requested gloss" do
+          gloss = Gloss.create! valid_attributes
+          patch gloss_url(gloss), params: { gloss: new_attributes }
+          gloss.reload
+          expect(gloss.text).to eq("tranquility")
+        end
+
+        it "redirects to the gloss" do
+          gloss = Gloss.create! valid_attributes
+          patch gloss_url(gloss), params: { gloss: new_attributes }
+          gloss.reload
+          expect(response).to redirect_to(gloss_url(gloss))
+        end
+      end
+
+      context "with invalid parameters" do
+        it "renders a response with 422 status (i.e. to display the 'edit' template)" do
+          gloss = Gloss.create! valid_attributes
+          patch gloss_url(gloss), params: { gloss: invalid_attributes }
+          expect(response).to have_http_status(:unprocessable_content)
+        end
+      end
+    end
+
+    describe "DELETE /destroy" do
+      it "destroys the requested gloss" do
+        gloss = Gloss.create! valid_attributes
+        expect {
+          delete gloss_url(gloss)
+        }.to change(Gloss, :count).by(-1)
+      end
+
+      it "redirects to the glosses list" do
+        gloss = Gloss.create! valid_attributes
         delete gloss_url(gloss)
-      }.to change(Gloss, :count).by(-1)
-    end
-
-    it "redirects to the glosses list" do
-      gloss = Gloss.create! valid_attributes
-      delete gloss_url(gloss)
-      expect(response).to redirect_to(glosses_url)
+        expect(response).to redirect_to(glosses_url)
+      end
     end
   end
 end

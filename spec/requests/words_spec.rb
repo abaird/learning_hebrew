@@ -17,7 +17,8 @@ RSpec.describe "/words", type: :request do
   # This should return the minimal set of attributes required to create a valid
   # Word. As you add validations to Word, be sure to
   # adjust the attributes here as well.
-  let(:user) { users(:test_user) }
+  let(:regular_user) { users(:test_user) }
+  let(:superuser_account) { users(:superuser) }
   let(:deck) { decks(:basic_deck) }
 
   let(:valid_attributes) {
@@ -37,112 +38,170 @@ RSpec.describe "/words", type: :request do
     }
   }
 
-  before do
-    # Sign in user for authenticated requests
-    sign_in user
-  end
+  # Tests that work for both regular users and superusers
+  shared_examples "accessible to all authenticated users" do
+    describe "GET /index" do
+      it "renders a successful response" do
+        Word.create! valid_attributes
+        get words_url
+        expect(response).to be_successful
+      end
+    end
 
-  describe "GET /index" do
-    it "renders a successful response" do
-      Word.create! valid_attributes
-      get words_url
-      expect(response).to be_successful
+    describe "GET /show" do
+      it "renders a successful response" do
+        word = Word.create! valid_attributes
+        get word_url(word)
+        expect(response).to be_successful
+      end
     end
   end
 
-  describe "GET /show" do
-    it "renders a successful response" do
-      word = Word.create! valid_attributes
-      get word_url(word)
-      expect(response).to be_successful
-    end
-  end
+  context "as a regular user" do
+    before { sign_in regular_user }
 
-  describe "GET /new" do
-    it "renders a successful response" do
-      get new_word_url
-      expect(response).to be_successful
-    end
-  end
+    include_examples "accessible to all authenticated users"
 
-  describe "GET /edit" do
-    it "renders a successful response" do
-      word = Word.create! valid_attributes
-      get edit_word_url(word)
-      expect(response).to be_successful
+    describe "GET /new" do
+      it "redirects to root with authorization error" do
+        get new_word_url
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
+      end
     end
-  end
 
-  describe "POST /create" do
-    context "with valid parameters" do
-      it "creates a new Word" do
+    describe "GET /edit" do
+      it "redirects to root with authorization error" do
+        word = Word.create! valid_attributes
+        get edit_word_url(word)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
+      end
+    end
+
+    describe "POST /create" do
+      it "redirects to root with authorization error" do
         expect {
           post words_url, params: { word: valid_attributes }
-        }.to change(Word, :count).by(1)
-      end
-
-      it "redirects to the created word" do
-        post words_url, params: { word: valid_attributes }
-        expect(response).to redirect_to(word_url(Word.last))
-      end
-    end
-
-    context "with invalid parameters" do
-      it "does not create a new Word" do
-        expect {
-          post words_url, params: { word: invalid_attributes }
         }.to change(Word, :count).by(0)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
       end
+    end
 
-      it "renders a response with 422 status (i.e. to display the 'new' template)" do
-        post words_url, params: { word: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_content)
+    describe "PATCH /update" do
+      it "redirects to root with authorization error" do
+        word = Word.create! valid_attributes
+        patch word_url(word), params: { word: { representation: "שמח" } }
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
+      end
+    end
+
+    describe "DELETE /destroy" do
+      it "redirects to root with authorization error" do
+        word = Word.create! valid_attributes
+        expect {
+          delete word_url(word)
+        }.to change(Word, :count).by(0)
+        expect(response).to redirect_to(root_path)
+        expect(flash[:alert]).to eq("You are not authorized to perform this action.")
       end
     end
   end
 
-  describe "PATCH /update" do
-    context "with valid parameters" do
-      let(:new_attributes) {
-        skip("Add a hash of attributes valid for your model")
-      }
+  context "as a superuser" do
+    before { sign_in superuser_account }
 
-      it "updates the requested word" do
-        word = Word.create! valid_attributes
-        patch word_url(word), params: { word: new_attributes }
-        word.reload
-        skip("Add assertions for updated state")
-      end
+    include_examples "accessible to all authenticated users"
 
-      it "redirects to the word" do
-        word = Word.create! valid_attributes
-        patch word_url(word), params: { word: new_attributes }
-        word.reload
-        expect(response).to redirect_to(word_url(word))
+    describe "GET /new" do
+      it "renders a successful response" do
+        get new_word_url
+        expect(response).to be_successful
       end
     end
 
-    context "with invalid parameters" do
-      it "renders a response with 422 status (i.e. to display the 'edit' template)" do
+    describe "GET /edit" do
+      it "renders a successful response" do
         word = Word.create! valid_attributes
-        patch word_url(word), params: { word: invalid_attributes }
-        expect(response).to have_http_status(:unprocessable_content)
+        get edit_word_url(word)
+        expect(response).to be_successful
       end
     end
-  end
 
-  describe "DELETE /destroy" do
-    it "destroys the requested word" do
-      word = Word.create! valid_attributes
-      expect {
+    describe "POST /create" do
+      context "with valid parameters" do
+        it "creates a new Word" do
+          expect {
+            post words_url, params: { word: valid_attributes }
+          }.to change(Word, :count).by(1)
+        end
+
+        it "redirects to the created word" do
+          post words_url, params: { word: valid_attributes }
+          expect(response).to redirect_to(word_url(Word.last))
+        end
+      end
+
+      context "with invalid parameters" do
+        it "does not create a new Word" do
+          expect {
+            post words_url, params: { word: invalid_attributes }
+          }.to change(Word, :count).by(0)
+        end
+
+        it "renders a response with 422 status (i.e. to display the 'new' template)" do
+          post words_url, params: { word: invalid_attributes }
+          expect(response).to have_http_status(:unprocessable_content)
+        end
+      end
+    end
+
+    describe "PATCH /update" do
+      context "with valid parameters" do
+        let(:new_attributes) {
+          { representation: "שמח", part_of_speech: "adjective" }
+        }
+
+        it "updates the requested word" do
+          word = Word.create! valid_attributes
+          patch word_url(word), params: { word: new_attributes }
+          word.reload
+          expect(word.representation).to eq("שמח")
+          expect(word.part_of_speech).to eq("adjective")
+        end
+
+        it "redirects to the word" do
+          word = Word.create! valid_attributes
+          patch word_url(word), params: { word: new_attributes }
+          word.reload
+          expect(response).to redirect_to(word_url(word))
+        end
+      end
+
+      context "with invalid parameters" do
+        it "renders a response with 422 status (i.e. to display the 'edit' template)" do
+          word = Word.create! valid_attributes
+          patch word_url(word), params: { word: invalid_attributes }
+          expect(response).to have_http_status(:unprocessable_content)
+        end
+      end
+    end
+
+    describe "DELETE /destroy" do
+      it "destroys the requested word" do
+        word = Word.create! valid_attributes
+        expect {
+          delete word_url(word)
+        }.to change(Word, :count).by(-1)
+      end
+
+      it "redirects to the words list" do
+        word = Word.create! valid_attributes
         delete word_url(word)
-      }.to change(Word, :count).by(-1)
-    end
-
-    it "redirects to the words list" do
-      word = Word.create! valid_attributes
-      delete word_url(word)
-      expect(response).to redirect_to(words_url)
+        expect(response).to redirect_to(words_url)
+      end
     end
   end
 end
