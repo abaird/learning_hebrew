@@ -12,14 +12,21 @@ RSpec.describe Deck, type: :model do
   end
 
   describe 'many-to-many relationship with words' do
-    let(:user) { User.create!(email: 'test@example.com', password: 'password123') }
+    let(:user) { User.create!(email: "deck_test_#{rand(10000)}@example.com", password: 'password123') }
     let(:deck1) { Deck.create!(name: 'Deck 1', user: user) }
     let(:deck2) { Deck.create!(name: 'Deck 2', user: user) }
     let(:word) { Word.create!(representation: 'שלום', part_of_speech: 'noun') }
 
+    after(:each) do
+      User.destroy_all
+      Deck.destroy_all
+      Word.destroy_all
+      DeckWord.destroy_all
+    end
+
     it 'can have multiple words' do
       word2 = Word.create!(representation: 'היי', part_of_speech: 'interjection')
-      deck1.words << [word, word2]
+      deck1.words << [ word, word2 ]
 
       expect(deck1.words.count).to eq(2)
       expect(deck1.words).to include(word, word2)

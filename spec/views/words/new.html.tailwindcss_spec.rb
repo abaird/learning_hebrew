@@ -24,8 +24,6 @@ RSpec.describe "words/new", type: :view do
       assert_select "input[name=?]", "word[pronunciation_url]"
 
       assert_select "input[name=?]", "word[picture_url]"
-
-      assert_select "input[name=?]", "word[deck_id]"
     end
   end
 end

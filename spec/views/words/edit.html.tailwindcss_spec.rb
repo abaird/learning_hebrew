@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "words/edit", type: :view do
-  fixtures :users, :decks, :words
+  fixtures :users, :decks, :words, :deck_words
   let(:word) { words(:shalom) }
 
   before(:each) do
@@ -21,8 +21,6 @@ RSpec.describe "words/edit", type: :view do
       assert_select "input[name=?]", "word[pronunciation_url]"
 
       assert_select "input[name=?]", "word[picture_url]"
-
-      assert_select "input[name=?]", "word[deck_id]"
     end
   end
 end

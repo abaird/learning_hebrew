@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "glosses/index", type: :view do
-  fixtures :users, :decks, :words, :glosses
+  fixtures :users, :decks, :words, :deck_words, :glosses
   before(:each) do
     assign(:glosses, [
       glosses(:shalom_peace),

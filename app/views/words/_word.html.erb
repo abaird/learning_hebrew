@@ -20,7 +20,7 @@
     <%= word.picture_url %>
   </div>
   <div>
-    <strong class="block font-medium mb-1">Deck:</strong>
-    <%= word.deck_id %>
+    <strong class="block font-medium mb-1">Decks:</strong>
+    <%= word.decks.map(&:name).join(", ") %>
   </div>
 </div>

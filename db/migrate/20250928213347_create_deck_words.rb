@@ -7,6 +7,6 @@ class CreateDeckWords < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :deck_words, [:deck_id, :word_id], unique: true
+    add_index :deck_words, [ :deck_id, :word_id ], unique: true
   end
 end

@@ -6,6 +6,6 @@ class User < ApplicationRecord
   has_many :decks, dependent: :destroy
 
   def superuser?
-    superuser
+    !!superuser
   end
 end

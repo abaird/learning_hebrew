@@ -10,20 +10,23 @@ RSpec.describe User, type: :model do
   end
 
   describe 'superuser functionality' do
-    let(:regular_user) { User.create!(email: 'user@example.com', password: 'password123') }
-    let(:super_user) { User.create!(email: 'admin@example.com', password: 'password123', superuser: true) }
+    after(:each) do
+      User.destroy_all
+    end
 
     describe '#superuser?' do
       it 'returns false for regular users' do
-        expect(regular_user.superuser?).to be false
+        user = User.create!(email: "regular_#{rand(10000)}@example.com", password: 'password123')
+        expect(user.superuser?).to be false
       end
 
       it 'returns true for superusers' do
-        expect(super_user.superuser?).to be true
+        user = User.create!(email: "super_#{rand(10000)}@example.com", password: 'password123', superuser: true)
+        expect(user.superuser?).to be true
       end
 
       it 'returns false when superuser is nil' do
-        user = User.create!(email: 'test@example.com', password: 'password123')
+        user = User.create!(email: "nil_test_#{rand(10000)}@example.com", password: 'password123')
         expect(user.superuser?).to be false
       end
     end

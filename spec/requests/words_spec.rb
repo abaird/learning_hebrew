@@ -13,7 +13,7 @@ require 'rails_helper'
 # sticking to rails and rspec-rails APIs to keep things simple and stable.
 
 RSpec.describe "/words", type: :request do
-  fixtures :users, :decks, :words
+  fixtures :users, :decks, :words, :deck_words
   # This should return the minimal set of attributes required to create a valid
   # Word. As you add validations to Word, be sure to
   # adjust the attributes here as well.
@@ -26,16 +26,14 @@ RSpec.describe "/words", type: :request do
       part_of_speech: "noun",
       mnemonic: "Peace and greeting",
       pronunciation_url: "https://example.com/shalom.mp3",
-      picture_url: "https://example.com/peace.jpg",
-      deck_id: deck.id
+      picture_url: "https://example.com/peace.jpg"
     }
   }
 
   let(:invalid_attributes) {
     {
       representation: "",  # Invalid because representation is required
-      part_of_speech: "",  # Invalid because part_of_speech is required
-      deck_id: deck.id
+      part_of_speech: ""   # Invalid because part_of_speech is required
     }
   }
 

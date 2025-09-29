@@ -7,9 +7,16 @@ RSpec.describe DeckWord, type: :model do
   end
 
   describe 'validations' do
-    let(:user) { User.create!(email: 'test@example.com', password: 'password123') }
+    let(:user) { User.create!(email: "deck_word_test_#{rand(10000)}@example.com", password: 'password123') }
     let(:deck) { Deck.create!(name: 'Test Deck', user: user) }
     let(:word) { Word.create!(representation: 'שלום', part_of_speech: 'noun') }
+
+    after(:each) do
+      User.destroy_all
+      Deck.destroy_all
+      Word.destroy_all
+      DeckWord.destroy_all
+    end
 
     it 'validates uniqueness of deck_id scoped to word_id' do
       DeckWord.create!(deck: deck, word: word)

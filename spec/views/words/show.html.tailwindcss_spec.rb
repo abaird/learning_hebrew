@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe "words/show", type: :view do
-  fixtures :users, :decks, :words
+  fixtures :users, :decks, :words, :deck_words
   before(:each) do
     assign(:word, words(:shalom))
   end

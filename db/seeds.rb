@@ -7,3 +7,11 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+# Create superuser in development with simple password
+superuser = User.find_or_create_by(email: 'abaird@bairdsnet.net') do |user|
+  user.password = Rails.env.production? ? ENV['SUPERUSER_PASSWORD'] : 'secret!'
+  user.superuser = true
+end
+
+puts "Superuser created: #{superuser.email}"

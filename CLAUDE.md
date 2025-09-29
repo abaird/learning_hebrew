@@ -4,10 +4,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is a Hebrew learning application built with Ruby on Rails 8, featuring a hierarchical vocabulary structure:
+This is a Hebrew learning application built with Ruby on Rails 8, featuring a flexible many-to-many vocabulary structure:
 - Users create multiple Decks (vocabulary collections)
-- Each Deck contains Words (Hebrew vocabulary)
+- Words (Hebrew vocabulary) can belong to multiple Decks
 - Each Word has multiple Glosses (translations/definitions)
+- Superuser functionality for administrative access
 
 ## Development Commands
 
@@ -196,9 +197,10 @@ script/test.sh --format documentation --color
 ## Architecture
 
 ### Database Schema
-- **users**: Devise authentication (email, password)
+- **users**: Devise authentication (email, password, superuser)
 - **decks**: Named collections belonging to users (name, description, user_id)
-- **words**: Hebrew vocabulary items (representation, part_of_speech, mnemonic, pronunciation_url, picture_url, deck_id)
+- **words**: Hebrew vocabulary items (representation, part_of_speech, mnemonic, pronunciation_url, picture_url)
+- **deck_words**: Join table for many-to-many relationship (deck_id, word_id) with unique constraint
 - **glosses**: Translation definitions (text, word_id)
 
 ### Database Configuration
@@ -210,8 +212,15 @@ script/test.sh --format documentation --color
 
 ### Model Relationships
 ```
-User (1) → Decks (many) → Words (many) → Glosses (many)
+User (1) → Decks (many)
+Words (many) ↔ Decks (many) [via DeckWord join table]
+Words (1) → Glosses (many)
 ```
+
+**Key Features:**
+- Many-to-many relationship between Decks and Words allows flexible vocabulary organization
+- Superuser functionality with environment-aware database seeds
+- Comprehensive test coverage with proper fixture management
 
 ### Key Technologies
 - **Rails 8.0** with modern defaults
@@ -332,6 +341,23 @@ Uses Devise with custom configurations:
 - **Host authorization**: Configured for both GKE and minikube IP ranges in production environment
 
 ## Recent Updates
+
+### Database Schema Transformation (Phase 1-3)
+- **Schema Migration**: Transformed from hierarchical to many-to-many relationships
+- **New DeckWord Model**: Join table with unique constraints and proper validations
+- **Model Updates**: Updated all associations for Deck, Word, User models
+- **Superuser Implementation**: Added superuser flag with environment-aware seeds functionality
+- **Test Suite Fixes**: Resolved 32 test failures, achieved 111 passing examples with 0 failures
+- **Fixture Management**: Updated all test fixtures for new many-to-many relationships
+- **View Template Updates**: Modified templates to use new associations
+- **Database Seeds**: Environment-aware superuser creation (development vs production passwords)
+
+**Technical Details:**
+- Created `deck_words` join table with `[deck_id, word_id]` unique index
+- Removed `deck_id` foreign key from `words` table
+- Added `superuser` boolean column to `users` table (default: false)
+- Updated controller parameter handling for new associations
+- Implemented proper `superuser?` method with nil-safe boolean conversion
 
 ### Tilt Integration for Fast Development
 - **Installed Tilt v0.35.1**: Fast Kubernetes development workflow with live updates

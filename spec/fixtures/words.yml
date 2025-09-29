@@ -5,7 +5,6 @@ shalom:
   mnemonic: "Peace and greeting"
   pronunciation_url: "https://example.com/shalom.mp3"
   picture_url: "https://example.com/peace.jpg"
-  deck: basic_deck
   created_at: <%= 1.day.ago %>
   updated_at: <%= 1.day.ago %>
 
@@ -15,7 +14,6 @@ toda:
   mnemonic: "Thank you"
   pronunciation_url: "https://example.com/toda.mp3"
   picture_url: "https://example.com/thanks.jpg"
-  deck: basic_deck
   created_at: <%= 1.day.ago %>
   updated_at: <%= 1.day.ago %>
 
@@ -25,6 +23,5 @@ bayit:
   mnemonic: "House or home"
   pronunciation_url: "https://example.com/bayit.mp3"
   picture_url: "https://example.com/house.jpg"
-  deck: advanced_deck
   created_at: <%= 2.days.ago %>
   updated_at: <%= 2.days.ago %>
