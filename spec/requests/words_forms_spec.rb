@@ -35,23 +35,23 @@ RSpec.describe "Word Forms Integration", type: :request do
         it "creates word and associates with selected decks" do
           expect {
             post words_url, params: {
-              word: valid_attributes.merge(deck_ids: [deck1.id, deck2.id])
+              word: valid_attributes.merge(deck_ids: [ deck1.id, deck2.id ])
             }
           }.to change(Word, :count).by(1)
 
           word = Word.last
-          expect(word.decks).to match_array([deck1, deck2])
+          expect(word.decks).to match_array([ deck1, deck2 ])
         end
 
         it "creates word with single deck" do
           expect {
             post words_url, params: {
-              word: valid_attributes.merge(deck_ids: [deck1.id])
+              word: valid_attributes.merge(deck_ids: [ deck1.id ])
             }
           }.to change(Word, :count).by(1)
 
           word = Word.last
-          expect(word.decks).to match_array([deck1])
+          expect(word.decks).to match_array([ deck1 ])
         end
 
         it "creates word with no deck selection" do
@@ -91,11 +91,11 @@ RSpec.describe "Word Forms Integration", type: :request do
 
       it "updates word deck associations" do
         patch word_url(word), params: {
-          word: valid_attributes.merge(deck_ids: [deck2.id])
+          word: valid_attributes.merge(deck_ids: [ deck2.id ])
         }
 
         word.reload
-        expect(word.decks).to match_array([deck2])
+        expect(word.decks).to match_array([ deck2 ])
       end
 
       it "removes all deck associations when none selected" do

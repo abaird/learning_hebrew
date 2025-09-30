@@ -1,0 +1,55 @@
+<nav class="bg-blue-600 text-white shadow-lg fixed top-0 left-0 right-0 z-50">
+  <div class="container mx-auto px-5">
+    <div class="flex items-center justify-between h-16">
+      <!-- Logo/Brand -->
+      <div class="flex items-center">
+        <%= link_to root_path, class: "flex items-center space-x-2 text-white hover:text-blue-100 transition" do %>
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+          </svg>
+          <span class="font-bold text-xl">Learning Hebrew</span>
+        <% end %>
+      </div>
+
+      <% if user_signed_in? %>
+        <!-- Main Navigation Links -->
+        <div class="flex items-center space-x-1">
+          <%= link_to words_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(words_path) ? 'bg-blue-700' : ''}" do %>
+            Words
+          <% end %>
+
+          <%= link_to decks_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(decks_path) ? 'bg-blue-700' : ''}" do %>
+            Decks
+          <% end %>
+
+          <%= link_to glosses_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(glosses_path) ? 'bg-blue-700' : ''}" do %>
+            Glosses
+          <% end %>
+        </div>
+
+        <!-- User Menu -->
+        <div class="flex items-center space-x-3">
+          <div class="flex items-center space-x-2">
+            <% if current_user.superuser? %>
+              <span class="px-2 py-1 bg-yellow-500 text-yellow-900 rounded text-xs font-semibold">
+                Superuser
+              </span>
+            <% end %>
+            <span class="text-sm text-blue-100">
+              <%= current_user.email %>
+            </span>
+          </div>
+
+          <%= button_to destroy_user_session_path, method: :delete, class: "px-4 py-2 bg-blue-700 hover:bg-blue-800 rounded-md text-sm font-medium transition" do %>
+            Sign out
+          <% end %>
+        </div>
+      <% else %>
+        <!-- Not signed in -->
+        <div class="flex items-center space-x-2">
+          <%= link_to "Sign in", new_user_session_path, class: "px-4 py-2 bg-blue-700 hover:bg-blue-800 rounded-md text-sm font-medium transition" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</nav>

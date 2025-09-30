@@ -22,6 +22,6 @@ class ApplicationController < ActionController::Base
   end
 
   def after_sign_out_path_for(resource_or_scope)
-    logout_path  # Redirect to your custom logout page
+    root_path  # Redirect to root (which will redirect to sign in)
   end
 end

@@ -24,18 +24,14 @@ fi
 
 echo "🔧 Setting up test database..."
 
-# Get the current DATABASE_URL and modify it for test environment
-CURRENT_DATABASE_URL=$(kubectl exec deployment/learning-hebrew-app -n learning-hebrew -- env | grep "DATABASE_URL=" | cut -d= -f2-)
-TEST_DATABASE_URL=$(echo "$CURRENT_DATABASE_URL" | sed 's/learning_hebrew_development/learning_hebrew_test/')
-
 echo "📦 Creating test database if needed..."
 kubectl exec deployment/learning-hebrew-app -n learning-hebrew -- \
-    env RAILS_ENV=test DATABASE_URL="$TEST_DATABASE_URL" \
+    env RAILS_ENV=test DATABASE_NAME=learning_hebrew_test \
     bundle exec rails db:create db:schema:load
 
 echo "🏃 Running RSpec tests..."
 kubectl exec -it deployment/learning-hebrew-app -n learning-hebrew -- \
-    env RAILS_ENV=test DATABASE_URL="$TEST_DATABASE_URL" FORCE_COLOR=1 \
+    env RAILS_ENV=test DATABASE_NAME=learning_hebrew_test FORCE_COLOR=1 \
     bundle exec rspec "$@"
 
 echo "✅ Tests completed!"

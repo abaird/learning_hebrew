@@ -28,7 +28,10 @@
       "Bash(kubectl config:*)",
       "Bash(PGPASSWORD=password kubectl exec deployment/postgres -n learning-hebrew -- psql -U postgres -h localhost -c '\\l')",
       "Bash(kubectl run:*)",
-      "Bash(kubectl delete deployment:*)"
+      "Bash(kubectl delete deployment:*)",
+      "Bash(git add:*)",
+      "Bash(bin/rails generate:*)",
+      "Bash(RAILS_ENV=test bin/rails db:create db:migrate)"
     ],
     "deny": [],
     "ask": []

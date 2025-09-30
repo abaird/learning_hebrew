@@ -74,14 +74,17 @@ curl https://learning-hebrew.bairdsnet.net/up
 
 #### Local Development (minikube)
 ```bash
+# Bootstrap from scratch (recommended for fresh setup)
+script/bootstrap.sh
+
 # Manual context switching (or use script/dev.sh)
 kubectl config use-context minikube
 
 # Set Docker environment for minikube
 eval $(minikube docker-env)
 
-# Build local image
-docker build -t learning-hebrew:latest .
+# Build local image (note: use 'local' tag)
+docker build -t learning-hebrew:local .
 
 # Toggle to local images (use script)
 ./script/toggle-image.sh
@@ -91,11 +94,11 @@ kubectl apply -f k8s/namespace.yaml
 kubectl apply -f k8s/configmap.yaml
 kubectl apply -f k8s/secrets-local.yaml
 kubectl apply -f k8s/postgres.yaml
-kubectl apply -f k8s/rails-app.yaml
+kubectl apply -f k8s/local/rails-app-local.yaml
 kubectl apply -f k8s/ingress.yaml
 
 # Port forward for local access (or done automatically by script/dev.sh)
-kubectl port-forward service/learning-hebrew-service 8080:80 -n learning-hebrew
+kubectl port-forward service/learning-hebrew-service 3000:80 -n learning-hebrew
 ```
 
 ### Testing
@@ -208,7 +211,7 @@ script/test.sh --format documentation --color
 - **Test**: `learning_hebrew_test` - isolated test environment with automatic cleanup
 - **Production**: `learning_hebrew_production` - production data with strong security
 - **Host Detection**: Automatically uses `localhost` for local development, `db` for containerized environments
-- **Environment Variables**: `DATABASE_HOST` and `DATABASE_URL` control connection settings
+- **Environment Variables**: `DATABASE_HOST`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `DATABASE_NAME` control connection settings (no hardcoded DATABASE_URL)
 
 ### Model Relationships
 ```
@@ -220,23 +223,30 @@ Words (1) → Glosses (many)
 **Key Features:**
 - Many-to-many relationship between Decks and Words allows flexible vocabulary organization
 - Superuser functionality with environment-aware database seeds
-- Comprehensive test coverage with proper fixture management
+- Authorization with Pundit for role-based access control
+- Modern UI with Tailwind CSS and responsive navigation
+- Comprehensive test coverage with proper fixture management (197 examples, 0 failures)
 
 ### Key Technologies
 - **Rails 8.0** with modern defaults
 - **PostgreSQL** database
-- **Devise** for authentication
-- **Tailwind CSS** for styling
+- **Devise** for authentication with customized views
+- **Pundit** for authorization and role-based access control
+- **Tailwind CSS** for styling with responsive design
 - **Turbo/Stimulus** for frontend interactivity
 - **RSpec** for testing
 - **Docker** for containerized development
 
 ### File Structure
 - `app/models/`: ActiveRecord models with validations and associations
-- `app/controllers/`: RESTful controllers for decks, words, glosses
-- `app/views/`: ERB templates organized by controller
+- `app/controllers/`: RESTful controllers for decks, words, glosses with Pundit authorization
+- `app/policies/`: Pundit authorization policies for role-based access control
+- `app/views/`: ERB templates organized by controller with Tailwind CSS styling
+- `app/views/devise/`: Customized Devise authentication views
+- `app/views/layouts/`: Application layout with responsive navigation header
 - `db/migrate/`: Database migration files
 - `config/routes.rb`: Defines RESTful routes for all resources
+- `spec/`: RSpec test suite with comprehensive coverage
 
 ## Development Environment
 
@@ -333,14 +343,44 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .database.connected
 curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
 ```
 
-## Authentication
+## Authentication & Authorization
 
-Uses Devise with custom configurations:
+### Authentication (Devise)
+- **Customized views**: Modern, styled authentication pages with Tailwind CSS
 - **Root route**: `words#index` (vocabulary listing)
-- **Redirects**: Custom `after_sign_in_path_for` and `after_sign_out_path_for`
+- **Redirects**: Custom `after_sign_in_path_for` (words_path) and `after_sign_out_path_for` (root_path)
 - **Host authorization**: Configured for both GKE and minikube IP ranges in production environment
 
+### Authorization (Pundit)
+- **Role-based access control**: Superusers vs regular users
+- **Policies**: ApplicationPolicy, DeckPolicy, WordPolicy, GlossPolicy
+- **Superuser privileges**: Full CRUD access to all resources
+- **Regular user privileges**: Can view all resources, can manage own decks
+- **Read-only for non-owners**: Words and Glosses are read-only for regular users
+
 ## Recent Updates
+
+### UI/UX Improvements (Phase 6)
+- **Responsive Navigation**: Modern header with logo, active page highlighting, and user info display
+- **Superuser Badge**: Visual indicator in navigation for superuser accounts
+- **Styled Authentication**: Professional sign-in page with centered design and Tailwind styling
+- **Flash Messages**: Styled notice/alert messages with color-coded backgrounds
+- **Navigation Tests**: Comprehensive integration tests for authentication flows and navigation
+- **Improved UX**: Consistent design language across all pages
+
+### Authorization System (Phase 4)
+- **Pundit Integration**: Complete authorization framework for role-based access control
+- **Policy Coverage**: Comprehensive policies for all resources (Decks, Words, Glosses)
+- **Superuser Access**: Full administrative capabilities for superuser accounts
+- **User Restrictions**: Regular users can manage own decks, read-only access to words/glosses
+- **Authorization Tests**: Full policy test coverage with 197 passing examples
+
+### Enhanced Form UI (Phase 5)
+- **Word Forms**: Deck selection via checkboxes instead of raw ID inputs
+- **Gloss Forms**: Word selection via dropdown instead of raw ID inputs
+- **Form Integration Tests**: Comprehensive testing of form interactions
+- **Database Security**: Removed hardcoded DATABASE_URL, using individual environment variables
+- **Deployment Fixes**: Fixed database seeds and authentication in Kubernetes
 
 ### Database Schema Transformation (Phase 1-3)
 - **Schema Migration**: Transformed from hierarchical to many-to-many relationships
@@ -391,12 +431,13 @@ Uses Devise with custom configurations:
 - **Automated secret injection**: CI/CD pipeline pulls secrets from Google Secret Manager
 
 ### Developer Experience
+- **Bootstrap script**: `script/bootstrap.sh` for automated minikube setup from scratch
 - **Environment switching scripts**: `script/dev.sh` and `script/prod.sh` for easy context switching
 - **Automatic port forwarding**: Development script auto-starts localhost access
 - **Pre-push Git hooks**: Rubocop runs automatically before push to prevent CI failures
 - **Deployment diagnostics**: Enhanced `/up` endpoint shows Git SHA, build info, and system status
 - **Test environment isolation**: `script/test.sh` runs tests in proper test environment with separate database
-- **Database configuration**: Smart host detection for local vs containerized environments
+- **Database configuration**: Smart host detection for local vs containerized environments using environment variables
 
 ### Infrastructure Improvements
 - **Dual environment support**: Minikube (development) vs GKE (production) with proper separation
