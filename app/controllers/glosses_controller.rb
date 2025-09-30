@@ -15,11 +15,13 @@ class GlossesController < ApplicationController
   # GET /glosses/new
   def new
     @gloss = Gloss.new
+    @words = Word.all.order(:representation)
     authorize @gloss
   end
 
   # GET /glosses/1/edit
   def edit
+    @words = Word.all.order(:representation)
     authorize @gloss
   end
 
@@ -33,6 +35,7 @@ class GlossesController < ApplicationController
         format.html { redirect_to @gloss, notice: "Gloss was successfully created." }
         format.json { render :show, status: :created, location: @gloss }
       else
+        @words = Word.all.order(:representation)
         format.html { render :new, status: :unprocessable_content }
         format.json { render json: @gloss.errors, status: :unprocessable_content }
       end
@@ -47,6 +50,7 @@ class GlossesController < ApplicationController
         format.html { redirect_to @gloss, notice: "Gloss was successfully updated." }
         format.json { render :show, status: :ok, location: @gloss }
       else
+        @words = Word.all.order(:representation)
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @gloss.errors, status: :unprocessable_content }
       end

@@ -17,8 +17,17 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :word_id %>
-    <%= form.text_field :word_id, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": gloss.errors[:word_id].none?, "border-red-400 focus:outline-red-600": gloss.errors[:word_id].any?}] %>
+    <%= form.label :word_id, "Word", class: "block text-sm font-medium text-gray-700" %>
+    <% if defined?(@words) && @words.any? %>
+      <%= form.collection_select :word_id, @words, :id, :representation,
+          { prompt: "Select a word..." },
+          { class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full",
+                   {"border-gray-400 focus:outline-blue-600": gloss.errors[:word_id].none?,
+                    "border-red-400 focus:outline-red-600": gloss.errors[:word_id].any?}] } %>
+    <% else %>
+      <p class="mt-2 text-sm text-gray-500">No words available. Create a word first.</p>
+      <%= form.hidden_field :word_id %>
+    <% end %>
   </div>
 
   <div class="inline">

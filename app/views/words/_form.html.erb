@@ -36,7 +36,22 @@
     <%= form.text_field :picture_url, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": word.errors[:picture_url].none?, "border-red-400 focus:outline-red-600": word.errors[:picture_url].any?}] %>
   </div>
 
-  <!-- Deck selection will be implemented in Phase 5 with proper UI -->
+  <div class="my-5">
+    <%= form.label :deck_ids, "Decks", class: "block text-sm font-medium text-gray-700" %>
+    <% if defined?(@decks) && @decks.any? %>
+      <div class="mt-2 space-y-2">
+        <% @decks.each do |deck| %>
+          <div class="flex items-center">
+            <%= form.check_box :deck_ids, { multiple: true, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" }, deck.id, "" %>
+            <%= form.label "deck_ids_#{deck.id}", deck.name, class: "ml-2 text-sm text-gray-900" %>
+          </div>
+        <% end %>
+        <%= form.hidden_field :deck_ids, value: "", multiple: true %>
+      </div>
+    <% else %>
+      <p class="mt-2 text-sm text-gray-500">No decks available</p>
+    <% end %>
+  </div>
 
   <div class="inline">
     <%= form.submit class: "w-full sm:w-auto rounded-md px-3.5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white inline-block font-medium cursor-pointer" %>

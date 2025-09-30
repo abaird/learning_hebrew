@@ -17,7 +17,7 @@ spec:
       - name: db-migrate
         image: learning-hebrew:local
         imagePullPolicy: Never  # Use local image
-        command: ["bin/rails", "db:migrate"]
+        command: ["bin/rails", "db:migrate", "db:seed"]
         envFrom:
         - configMapRef:
             name: app-config
@@ -32,8 +32,6 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: postgres-password
-        - name: DATABASE_URL
-          value: "postgresql://postgres:password@postgres-service:5432/learning_hebrew_development"
       containers:
       - name: rails-app
         image: learning-hebrew:local
@@ -54,8 +52,6 @@ spec:
             secretKeyRef:
               name: app-secrets
               key: postgres-password
-        - name: DATABASE_URL
-          value: "postgresql://postgres:password@postgres-service:5432/learning_hebrew_development"
         resources:
           requests:
             memory: "128Mi"

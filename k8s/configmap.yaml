@@ -12,3 +12,7 @@ data:
   RAILS_LOG_TO_STDOUT: "true"
   RAILS_FORCE_SSL: "false"
   RAILS_ALLOWED_HOSTS: "localhost,34.117.81.26,learning-hebrew.bairdsnet.net"
+  GIT_SHA: "local-dev"
+  BUILD_NUMBER: "local"
+  DEPLOYED_AT: "local-development"
+  IMAGE_TAG: "local"
