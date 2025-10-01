@@ -8,3 +8,15 @@
  *
  * Consider organizing styles into separate files for maintainability.
  */
+
+@font-face {
+  font-family: 'SBL Hebrew';
+  src: url('SBLHebrew.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+.font-hebrew {
+  font-family: 'SBL Hebrew', serif;
+}
