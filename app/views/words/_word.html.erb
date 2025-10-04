@@ -5,7 +5,7 @@
   </div>
   <div>
     <strong class="block font-medium mb-1">Part of speech:</strong>
-    <%= word.part_of_speech %>
+    <%= word.pos_display.presence || "(not set)" %>
   </div>
   <div>
     <strong class="block font-medium mb-1">Mnemonic:</strong>

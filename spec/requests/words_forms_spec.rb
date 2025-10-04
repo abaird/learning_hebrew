@@ -10,7 +10,6 @@ RSpec.describe "Word Forms Integration", type: :request do
   let(:valid_attributes) {
     {
       representation: "שלום",
-      part_of_speech: "noun",
       mnemonic: "Peace and greeting",
       pronunciation_url: "https://example.com/shalom.mp3",
       picture_url: "https://example.com/peace.jpg"

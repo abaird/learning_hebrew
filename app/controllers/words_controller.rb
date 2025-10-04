@@ -15,13 +15,13 @@ class WordsController < ApplicationController
   # GET /words/new
   def new
     @word = Word.new
-    @decks = current_user.superuser? ? Deck.all : current_user.decks
+    load_form_data
     authorize @word
   end
 
   # GET /words/1/edit
   def edit
-    @decks = current_user.superuser? ? Deck.all : current_user.decks
+    load_form_data
     authorize @word
   end
 
@@ -35,7 +35,7 @@ class WordsController < ApplicationController
         format.html { redirect_to @word, notice: "Word was successfully created." }
         format.json { render :show, status: :created, location: @word }
       else
-        @decks = current_user.superuser? ? Deck.all : current_user.decks
+        load_form_data
         format.html { render :new, status: :unprocessable_content }
         format.json { render json: @word.errors, status: :unprocessable_content }
       end
@@ -50,7 +50,7 @@ class WordsController < ApplicationController
         format.html { redirect_to @word, notice: "Word was successfully updated." }
         format.json { render :show, status: :ok, location: @word }
       else
-        @decks = current_user.superuser? ? Deck.all : current_user.decks
+        load_form_data
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @word.errors, status: :unprocessable_content }
       end
@@ -74,8 +74,16 @@ class WordsController < ApplicationController
       @word = Word.find(params.expect(:id))
     end
 
+    # Load data needed for the form
+    def load_form_data
+      @decks = current_user.superuser? ? Deck.all : current_user.decks
+      @pos_categories = PartOfSpeechCategory.all.order(:name)
+      @genders = Gender.all.order(:name)
+      @verb_forms = VerbForm.all.order(:name)
+    end
+
     # Only allow a list of trusted parameters through.
     def word_params
-      params.expect(word: [ :representation, :part_of_speech, :mnemonic, :pronunciation_url, :picture_url, deck_ids: [] ])
+      params.expect(word: [ :representation, :part_of_speech_category_id, :gender_id, :verb_form_id, :mnemonic, :pronunciation_url, :picture_url, deck_ids: [] ])
     end
 end

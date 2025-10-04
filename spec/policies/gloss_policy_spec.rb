@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe GlossPolicy, type: :policy do
   let(:superuser) { User.create!(email: "super_#{rand(10000)}@example.com", password: 'password123', superuser: true) }
   let(:regular_user) { User.create!(email: "regular_#{rand(10000)}@example.com", password: 'password123') }
-  let(:word) { Word.create!(representation: 'שלום', part_of_speech: 'noun') }
+  let(:word) { Word.create!(representation: 'שלום') }
   let(:gloss) { Gloss.create!(text: 'peace', word: word) }
 
   after(:each) do

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_09_28_213405) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_04_182453) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -33,12 +33,26 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_28_213405) do
     t.index ["user_id"], name: "index_decks_on_user_id"
   end
 
+  create_table "genders", force: :cascade do |t|
+    t.string "name"
+    t.string "abbrev"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "glosses", force: :cascade do |t|
     t.text "text", null: false
     t.bigint "word_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["word_id"], name: "index_glosses_on_word_id"
+  end
+
+  create_table "part_of_speech_categories", force: :cascade do |t|
+    t.string "name"
+    t.string "abbrev"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "users", force: :cascade do |t|
@@ -55,18 +69,34 @@ ActiveRecord::Schema[8.0].define(version: 2025_09_28_213405) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "verb_forms", force: :cascade do |t|
+    t.string "name"
+    t.string "abbrev"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "words", force: :cascade do |t|
     t.string "representation", null: false
-    t.string "part_of_speech", null: false
     t.text "mnemonic"
     t.string "pronunciation_url"
     t.string "picture_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "part_of_speech_category_id"
+    t.bigint "gender_id"
+    t.bigint "verb_form_id"
+    t.string "pos_display"
+    t.index ["gender_id"], name: "index_words_on_gender_id"
+    t.index ["part_of_speech_category_id"], name: "index_words_on_part_of_speech_category_id"
+    t.index ["verb_form_id"], name: "index_words_on_verb_form_id"
   end
 
   add_foreign_key "deck_words", "decks"
   add_foreign_key "deck_words", "words"
   add_foreign_key "decks", "users"
   add_foreign_key "glosses", "words"
+  add_foreign_key "words", "genders"
+  add_foreign_key "words", "part_of_speech_categories"
+  add_foreign_key "words", "verb_forms"
 end

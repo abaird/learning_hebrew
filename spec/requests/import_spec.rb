@@ -80,7 +80,7 @@ RSpec.describe "Imports", type: :request do
         expect(response.body).to include('Successfully imported 2 words')
       end
 
-      it "creates words with 'unknown' part of speech" do
+      it "creates words with 'unknown' part of speech category" do
         file = Rack::Test::UploadedFile.new(
           StringIO.new(valid_file_content),
           'text/plain',
@@ -90,11 +90,11 @@ RSpec.describe "Imports", type: :request do
         post import_path, params: { file: file }
 
         word = Word.find_by(representation: 'שָׁלוֹם')
-        expect(word.part_of_speech).to eq('unknown')
+        expect(word.part_of_speech_category&.abbrev).to eq('?')
       end
 
       it "updates existing word and replaces glosses" do
-        existing_word = Word.create!(representation: 'שָׁלוֹם', part_of_speech: 'noun')
+        existing_word = Word.create!(representation: 'שָׁלוֹם')
         existing_word.glosses.create!(text: 'old gloss')
 
         file = Rack::Test::UploadedFile.new(
@@ -151,14 +151,14 @@ RSpec.describe "Imports", type: :request do
           post import_path, params: { file: file }
         }.not_to change(Word, :count)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('must start with a Hebrew word')
       end
 
       it "shows error if no file provided" do
         post import_path, params: {}
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('No file provided')
       end
     end

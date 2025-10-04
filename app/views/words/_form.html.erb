@@ -17,8 +17,24 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :part_of_speech %>
-    <%= form.text_field :part_of_speech, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": word.errors[:part_of_speech].none?, "border-red-400 focus:outline-red-600": word.errors[:part_of_speech].any?}] %>
+    <%= form.label :part_of_speech_category_id, "Part of Speech" %>
+    <%= form.collection_select :part_of_speech_category_id, @pos_categories, :id, :name,
+      { include_blank: "(not set)", selected: word.part_of_speech_category_id },
+      { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :gender_id, "Gender" %>
+    <%= form.collection_select :gender_id, @genders, :id, :name,
+      { include_blank: "(not set)", selected: word.gender_id },
+      { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
+  </div>
+
+  <div class="my-5">
+    <%= form.label :verb_form_id, "Verb Form" %>
+    <%= form.collection_select :verb_form_id, @verb_forms, :id, :name,
+      { include_blank: "(not set)", selected: word.verb_form_id },
+      { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
   </div>
 
   <div class="my-5">

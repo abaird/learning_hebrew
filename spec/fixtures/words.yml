@@ -1,7 +1,6 @@
 # Test word fixtures
 shalom:
   representation: "שלום"
-  part_of_speech: "noun"
   mnemonic: "Peace and greeting"
   pronunciation_url: "https://example.com/shalom.mp3"
   picture_url: "https://example.com/peace.jpg"
@@ -10,7 +9,6 @@ shalom:
 
 toda:
   representation: "תודה"
-  part_of_speech: "noun"
   mnemonic: "Thank you"
   pronunciation_url: "https://example.com/toda.mp3"
   picture_url: "https://example.com/thanks.jpg"
@@ -19,7 +17,6 @@ toda:
 
 bayit:
   representation: "בית"
-  part_of_speech: "noun"
   mnemonic: "House or home"
   pronunciation_url: "https://example.com/bayit.mp3"
   picture_url: "https://example.com/house.jpg"

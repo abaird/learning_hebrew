@@ -14,16 +14,16 @@ RSpec.describe "Dictionaries", type: :request do
     end
 
     it "displays words sorted alphabetically in Hebrew" do
-      word1 = Word.create!(representation: 'ב', part_of_speech: 'noun')
-      word2 = Word.create!(representation: 'א', part_of_speech: 'verb')
-      word3 = Word.create!(representation: 'ג', part_of_speech: 'adjective')
+      word1 = Word.create!(representation: 'ב')
+      word2 = Word.create!(representation: 'א')
+      word3 = Word.create!(representation: 'ג')
 
       get root_path
       expect(response.body).to match(/א.*ב.*ג/m)
     end
 
     it "displays glosses for each word" do
-      word = Word.create!(representation: 'שלום', part_of_speech: 'noun')
+      word = Word.create!(representation: 'שלום')
       word.glosses.create!(text: 'peace')
       word.glosses.create!(text: 'hello')
 
@@ -33,7 +33,7 @@ RSpec.describe "Dictionaries", type: :request do
     end
 
     it "shows message when word has no glosses" do
-      word = Word.create!(representation: 'שלום', part_of_speech: 'noun')
+      word = Word.create!(representation: 'שלום')
 
       get root_path
       expect(response.body).to include('No definitions yet')
@@ -41,7 +41,7 @@ RSpec.describe "Dictionaries", type: :request do
 
     it "paginates results" do
       30.times do |i|
-        Word.create!(representation: "word#{i}", part_of_speech: 'noun')
+        Word.create!(representation: "word#{i}")
       end
 
       get root_path

@@ -8,7 +8,9 @@
       <div class="pb-4">
         <div class="flex items-baseline flex-wrap" style="gap: 0.5rem">
           <span class="text-3xl font-hebrew"><%= word.representation %></span>
-          <span class="text-sm text-gray-600">(<%= word.part_of_speech %>)</span>
+          <% if word.pos_display.present? %>
+            <span class="text-sm text-gray-600">(<%= word.pos_display %>)</span>
+          <% end %>
 
           <% if word.glosses.any? %>
             <span class="text-gray-700">-</span>

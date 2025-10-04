@@ -9,7 +9,7 @@ RSpec.describe DeckWord, type: :model do
   describe 'validations' do
     let(:user) { User.create!(email: "deck_word_test_#{rand(10000)}@example.com", password: 'password123') }
     let(:deck) { Deck.create!(name: 'Test Deck', user: user) }
-    let(:word) { Word.create!(representation: 'שלום', part_of_speech: 'noun') }
+    let(:word) { Word.create!(representation: 'שלום') }
 
     after(:each) do
       User.destroy_all
@@ -34,7 +34,7 @@ RSpec.describe DeckWord, type: :model do
     end
 
     it 'allows different words in same deck' do
-      word2 = Word.create!(representation: 'היי', part_of_speech: 'interjection')
+      word2 = Word.create!(representation: 'היי')
       DeckWord.create!(deck: deck, word: word)
 
       expect(DeckWord.new(deck: deck, word: word2)).to be_valid

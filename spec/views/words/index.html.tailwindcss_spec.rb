@@ -12,7 +12,6 @@ RSpec.describe "words/index", type: :view do
   it "renders a list of words" do
     render
     expect(rendered).to match(/שלום/)
-    expect(rendered).to match(/noun/)
     expect(rendered).to match(/Peace and greeting/)
   end
 end

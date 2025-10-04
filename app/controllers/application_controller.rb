@@ -18,7 +18,7 @@ class ApplicationController < ActionController::Base
   protected
 
   def after_sign_in_path_for(resource)
-    words_path  # Redirect to words index after sign-in
+    root_path  # Redirect to dictionary (root) after sign-in
   end
 
   def after_sign_out_path_for(resource_or_scope)

@@ -4,11 +4,14 @@ RSpec.describe "words/new", type: :view do
   before(:each) do
     assign(:word, Word.new(
       representation: "MyString",
-      part_of_speech: "MyString",
       mnemonic: "MyText",
       pronunciation_url: "MyString",
       picture_url: "MyString"
     ))
+    assign(:pos_categories, PartOfSpeechCategory.all)
+    assign(:genders, Gender.all)
+    assign(:verb_forms, VerbForm.all)
+    assign(:decks, [])
   end
 
   it "renders new word form" do
@@ -17,7 +20,9 @@ RSpec.describe "words/new", type: :view do
     assert_select "form[action=?][method=?]", words_path, "post" do
       assert_select "input[name=?]", "word[representation]"
 
-      assert_select "input[name=?]", "word[part_of_speech]"
+      assert_select "select[name=?]", "word[part_of_speech_category_id]"
+      assert_select "select[name=?]", "word[gender_id]"
+      assert_select "select[name=?]", "word[verb_form_id]"
 
       assert_select "textarea[name=?]", "word[mnemonic]"
 

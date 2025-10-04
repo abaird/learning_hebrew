@@ -15,7 +15,7 @@ RSpec.describe Deck, type: :model do
     let(:user) { User.create!(email: "deck_test_#{rand(10000)}@example.com", password: 'password123') }
     let(:deck1) { Deck.create!(name: 'Deck 1', user: user) }
     let(:deck2) { Deck.create!(name: 'Deck 2', user: user) }
-    let(:word) { Word.create!(representation: 'שלום', part_of_speech: 'noun') }
+    let(:word) { Word.create!(representation: 'שלום') }
 
     after(:each) do
       User.destroy_all
@@ -25,7 +25,7 @@ RSpec.describe Deck, type: :model do
     end
 
     it 'can have multiple words' do
-      word2 = Word.create!(representation: 'היי', part_of_speech: 'interjection')
+      word2 = Word.create!(representation: 'היי')
       deck1.words << [ word, word2 ]
 
       expect(deck1.words.count).to eq(2)

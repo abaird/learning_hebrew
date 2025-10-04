@@ -9,14 +9,13 @@ RSpec.describe Word, type: :model do
 
   describe 'validations' do
     it { should validate_presence_of(:representation) }
-    it { should validate_presence_of(:part_of_speech) }
   end
 
   describe 'many-to-many relationship with decks' do
     let(:user) { User.create!(email: "word_test_#{rand(10000)}@example.com", password: 'password123') }
     let(:deck1) { Deck.create!(name: 'Deck 1', user: user) }
     let(:deck2) { Deck.create!(name: 'Deck 2', user: user) }
-    let(:word) { Word.create!(representation: 'שלום', part_of_speech: 'noun') }
+    let(:word) { Word.create!(representation: 'שלום') }
 
     after(:each) do
       User.destroy_all
@@ -43,7 +42,7 @@ RSpec.describe Word, type: :model do
   end
 
   describe '#formatted_glosses' do
-    let(:word) { Word.create!(representation: 'שָׁלוֹם', part_of_speech: 'noun') }
+    let(:word) { Word.create!(representation: 'שָׁלוֹם') }
 
     it 'returns empty string when word has no glosses' do
       expect(word.formatted_glosses).to eq('')

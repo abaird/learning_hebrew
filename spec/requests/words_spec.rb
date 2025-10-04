@@ -24,7 +24,6 @@ RSpec.describe "/words", type: :request do
   let(:valid_attributes) {
     {
       representation: "שלום",
-      part_of_speech: "noun",
       mnemonic: "Peace and greeting",
       pronunciation_url: "https://example.com/shalom.mp3",
       picture_url: "https://example.com/peace.jpg"
@@ -33,8 +32,7 @@ RSpec.describe "/words", type: :request do
 
   let(:invalid_attributes) {
     {
-      representation: "",  # Invalid because representation is required
-      part_of_speech: ""   # Invalid because part_of_speech is required
+      representation: ""  # Invalid because representation is required
     }
   }
 
@@ -161,7 +159,7 @@ RSpec.describe "/words", type: :request do
     describe "PATCH /update" do
       context "with valid parameters" do
         let(:new_attributes) {
-          { representation: "שמח", part_of_speech: "adjective" }
+          { representation: "שמח" }
         }
 
         it "updates the requested word" do
@@ -169,7 +167,6 @@ RSpec.describe "/words", type: :request do
           patch word_url(word), params: { word: new_attributes }
           word.reload
           expect(word.representation).to eq("שמח")
-          expect(word.part_of_speech).to eq("adjective")
         end
 
         it "redirects to the word" do

@@ -9,7 +9,6 @@ RSpec.describe "words/show", type: :view do
   it "renders attributes in <p>" do
     render
     expect(rendered).to match(/שלום/)
-    expect(rendered).to match(/noun/)
     expect(rendered).to match(/Peace and greeting/)
   end
 end
