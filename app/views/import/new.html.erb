@@ -1,0 +1,50 @@
+<div class="w-full max-w-2xl mx-auto">
+  <h1 class="font-bold text-4xl mb-6">Import Dictionary</h1>
+
+  <% if local_assigns[:error] %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <strong>Error:</strong> <%= error %>
+    </div>
+  <% end %>
+
+  <div class="bg-white shadow-md rounded px-8 py-6 mb-4">
+    <h2 class="text-xl font-semibold mb-4">File Format</h2>
+    <p class="text-gray-700 mb-4">Upload a text file (.txt) with the following format:</p>
+
+    <div class="bg-gray-100 p-4 rounded font-mono text-sm mb-4">
+      <div class="mb-2">שָׁלוֹם</div>
+      <div class="ml-4">peace</div>
+      <div class="ml-4">hello</div>
+      <div>---</div>
+      <div class="mb-2">אֱלֹהִים</div>
+      <div class="ml-4">God</div>
+      <div class="ml-4">gods</div>
+      <div>---</div>
+    </div>
+
+    <ul class="list-disc list-inside text-gray-700 space-y-2 mb-6">
+      <li>First line: Hebrew word (with nikkud)</li>
+      <li>Following lines: English glosses (definitions)</li>
+      <li>Separator: <code class="bg-gray-200 px-2 py-1 rounded">---</code></li>
+      <li>Words with different nikkud are treated as different words</li>
+      <li>Existing words will have their glosses replaced</li>
+    </ul>
+
+    <%= form_with url: import_path, method: :post, multipart: true, local: true do |form| %>
+      <div class="mb-4">
+        <%= form.label :file, "Select Dictionary File (.txt)", class: "block text-gray-700 font-bold mb-2" %>
+        <%= form.file_field :file,
+            accept: ".txt,text/plain",
+            required: true,
+            class: "block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none p-2" %>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <%= form.submit "Import Dictionary",
+            class: "bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline cursor-pointer" %>
+        <%= link_to "Cancel", root_path,
+            class: "text-gray-600 hover:text-gray-800" %>
+      </div>
+    <% end %>
+  </div>
+</div>

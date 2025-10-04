@@ -3,30 +3,25 @@
     <h1 class="font-bold text-4xl">Hebrew Dictionary</h1>
   </div>
 
-  <div class="space-y-6">
+  <div class="space-y-2">
     <% @words.each do |word| %>
-      <div class="border-b pb-4">
-        <div class="flex items-baseline gap-4">
+      <div class="pb-4">
+        <div class="flex items-baseline flex-wrap" style="gap: 0.5rem">
           <span class="text-3xl font-hebrew"><%= word.representation %></span>
           <span class="text-sm text-gray-600">(<%= word.part_of_speech %>)</span>
+
+          <% if word.glosses.any? %>
+            <span class="text-gray-700">-</span>
+            <span class="text-gray-700">
+              <%= word.formatted_glosses %>
+            </span>
+          <% else %>
+            <span class="text-gray-500 italic">- No definitions yet</span>
+          <% end %>
         </div>
 
-        <% if word.glosses.any? %>
-          <div class="mt-2 ml-4">
-            <ul class="list-disc list-inside space-y-1">
-              <% word.glosses.each do |gloss| %>
-                <li class="text-gray-700"><%= gloss.text %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% else %>
-          <div class="mt-2 ml-4 text-gray-500 italic">
-            No definitions yet
-          </div>
-        <% end %>
-
         <% if word.mnemonic.present? %>
-          <div class="mt-2 ml-4 text-sm text-gray-600">
+          <div class="mt-1 ml-4 text-sm text-gray-600">
             <strong>Mnemonic:</strong> <%= word.mnemonic %>
           </div>
         <% end %>

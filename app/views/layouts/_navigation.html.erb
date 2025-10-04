@@ -14,6 +14,10 @@
       <% if user_signed_in? %>
         <!-- Main Navigation Links -->
         <div class="flex items-center space-x-1">
+          <%= link_to dictionary_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(words_path) ? 'bg-blue-700' : ''}" do %>
+            Dictionary
+          <% end %>
+
           <%= link_to words_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(words_path) ? 'bg-blue-700' : ''}" do %>
             Words
           <% end %>
@@ -24,6 +28,12 @@
 
           <%= link_to glosses_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(glosses_path) ? 'bg-blue-700' : ''}" do %>
             Glosses
+          <% end %>
+
+          <% if current_user.superuser? %>
+            <%= link_to new_import_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(new_import_path) ? 'bg-blue-700' : ''}" do %>
+              Import
+            <% end %>
           <% end %>
         </div>
 

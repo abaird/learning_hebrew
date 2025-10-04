@@ -41,4 +41,33 @@ RSpec.describe Word, type: :model do
       expect(deck2.words).to include(word)
     end
   end
+
+  describe '#formatted_glosses' do
+    let(:word) { Word.create!(representation: 'שָׁלוֹם', part_of_speech: 'noun') }
+
+    it 'returns empty string when word has no glosses' do
+      expect(word.formatted_glosses).to eq('')
+    end
+
+    it 'formats single gloss with number' do
+      word.glosses.create!(text: 'peace')
+
+      expect(word.formatted_glosses).to eq('1) peace')
+    end
+
+    it 'formats multiple glosses as numbered list separated by commas' do
+      word.glosses.create!(text: 'peace')
+      word.glosses.create!(text: 'hello')
+      word.glosses.create!(text: 'goodbye')
+
+      expect(word.formatted_glosses).to eq('1) peace, 2) hello, 3) goodbye')
+    end
+
+    it 'formats two glosses correctly' do
+      word.glosses.create!(text: 'woman')
+      word.glosses.create!(text: 'wife')
+
+      expect(word.formatted_glosses).to eq('1) woman, 2) wife')
+    end
+  end
 end
