@@ -109,7 +109,7 @@ RSpec.describe "Imports", type: :request do
          .and change(Gloss, :count).by(3) # Old gloss destroyed (-1), 2 new for existing word, 2 for new word = +3
 
         word = Word.find_by(representation: 'שָׁלוֹם')
-        expect(word.glosses.pluck(:text)).to match_array(['peace', 'hello'])
+        expect(word.glosses.pluck(:text)).to match_array([ 'peace', 'hello' ])
       end
 
       it "treats words with different nikkud as different words" do

@@ -13,7 +13,7 @@ class ImportController < ApplicationController
       return
     end
 
-    file_content = params[:file].read.force_encoding('UTF-8')
+    file_content = params[:file].read.force_encoding("UTF-8")
     parser = DictionaryImportParser.new(file_content)
 
     begin
@@ -33,7 +33,7 @@ class ImportController < ApplicationController
       parsed_data.each do |entry|
         # Find or create word (checking for exact match including nikkud)
         word = Word.find_or_initialize_by(representation: entry[:representation])
-        word.part_of_speech = 'unknown' if word.new_record?
+        word.part_of_speech = "unknown" if word.new_record?
         word.save!
 
         # Replace all existing glosses with new ones

@@ -70,4 +70,59 @@ RSpec.describe Word, type: :model do
       expect(word.formatted_glosses).to eq('1) woman, 2) wife')
     end
   end
+
+  describe '.hebrew_sort_key' do
+    it 'sorts Hebrew words without nikkud by consonant order' do
+      # אבג order - aleph (0), bet (1), gimel (2)
+      key_aleph = Word.hebrew_sort_key('א')
+      key_bet = Word.hebrew_sort_key('ב')
+      key_gimel = Word.hebrew_sort_key('ג')
+
+      expect(key_aleph).to eq([ [ 0, 0 ] ])
+      expect(key_bet).to eq([ [ 1, 0 ] ])
+      expect(key_gimel).to eq([ [ 2, 0 ] ])
+
+      # Verify sort order
+      expect(key_aleph <=> key_bet).to eq(-1)
+      expect(key_bet <=> key_gimel).to eq(-1)
+    end
+
+    it 'sorts words with nikkud using vowels as secondary sort key' do
+      # Same consonant (aleph=0), different vowels
+      # אַ - aleph with patach (vowel=1, "a" sound)
+      # אִ - aleph with hireq (vowel=5, "i" sound)
+      key_patach = Word.hebrew_sort_key('אַ')
+      key_hireq = Word.hebrew_sort_key('אִ')
+
+      expect(key_patach).to eq([ [ 0, 1 ] ])  # aleph, patach
+      expect(key_hireq).to eq([ [ 0, 5 ] ])   # aleph, hireq
+
+      # Patach (a) should come before hireq (i)
+      expect(key_patach <=> key_hireq).to eq(-1)
+    end
+
+    it 'sorts complete words with multiple consonants and vowels' do
+      # אַיֵּה (ayeh - "where") - aleph-patach, yod, he
+      # אִישׁ (ish - "man") - aleph-hireq, yod, shin
+      key_ayeh = Word.hebrew_sort_key('אַיֵּה')
+      key_ish = Word.hebrew_sort_key('אִישׁ')
+
+      # First character: both aleph (0), but patach (1) < hireq (5)
+      expect(key_ayeh.first).to eq([ 0, 1 ])
+      expect(key_ish.first).to eq([ 0, 5 ])
+
+      # ayeh should sort before ish
+      expect(key_ayeh <=> key_ish).to eq(-1)
+    end
+
+    it 'returns infinity for blank text' do
+      expect(Word.hebrew_sort_key('')).to eq([ Float::INFINITY ])
+      expect(Word.hebrew_sort_key(nil)).to eq([ Float::INFINITY ])
+    end
+
+    it 'returns infinity for non-Hebrew text' do
+      # Text that is not blank but contains no Hebrew characters
+      expect(Word.hebrew_sort_key('abc')).to eq([ [ Float::INFINITY, 0 ] ])
+    end
+  end
 end

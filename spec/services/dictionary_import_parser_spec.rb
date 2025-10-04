@@ -12,7 +12,7 @@ RSpec.describe DictionaryImportParser do
       result = DictionaryImportParser.new(content).parse
 
       expect(result).to eq([
-        { representation: 'שָׁלוֹם', glosses: ['peace'] }
+        { representation: 'שָׁלוֹם', glosses: [ 'peace' ] }
       ])
     end
 
@@ -28,7 +28,7 @@ RSpec.describe DictionaryImportParser do
       result = DictionaryImportParser.new(content).parse
 
       expect(result).to eq([
-        { representation: 'שָׁלוֹם', glosses: ['peace', 'hello', 'goodbye'] }
+        { representation: 'שָׁלוֹם', glosses: [ 'peace', 'hello', 'goodbye' ] }
       ])
     end
 
@@ -51,9 +51,9 @@ RSpec.describe DictionaryImportParser do
       result = DictionaryImportParser.new(content).parse
 
       expect(result).to eq([
-        { representation: 'אֱלֹהִים', glosses: ['God', 'gods'] },
-        { representation: 'שָׁלוֹם', glosses: ['peace', 'hello'] },
-        { representation: 'תּוֹרָה', glosses: ['Torah', 'instruction'] }
+        { representation: 'אֱלֹהִים', glosses: [ 'God', 'gods' ] },
+        { representation: 'שָׁלוֹם', glosses: [ 'peace', 'hello' ] },
+        { representation: 'תּוֹרָה', glosses: [ 'Torah', 'instruction' ] }
       ])
     end
 
@@ -88,7 +88,7 @@ RSpec.describe DictionaryImportParser do
       result = DictionaryImportParser.new(content).parse
 
       expect(result).to eq([
-        { representation: 'שָׁלוֹם', glosses: ['peace', 'hello'] }
+        { representation: 'שָׁלוֹם', glosses: [ 'peace', 'hello' ] }
       ])
     end
 
@@ -104,7 +104,7 @@ RSpec.describe DictionaryImportParser do
       result = DictionaryImportParser.new(content).parse
 
       expect(result).to eq([
-        { representation: 'שָׁלוֹם', glosses: ['peace', 'hello'] }
+        { representation: 'שָׁלוֹם', glosses: [ 'peace', 'hello' ] }
       ])
     end
 
@@ -119,7 +119,7 @@ RSpec.describe DictionaryImportParser do
       result = DictionaryImportParser.new(content).parse
 
       expect(result).to eq([
-        { representation: 'שָׁלוֹם', glosses: ['peace'] }
+        { representation: 'שָׁלוֹם', glosses: [ 'peace' ] }
       ])
     end
 
