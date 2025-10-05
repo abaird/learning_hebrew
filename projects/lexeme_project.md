@@ -1053,25 +1053,25 @@ end
 
 ---
 
-### Phase 8: Import System Updates
+### Phase 8: Import System Updates ✅
 **Goal:** Update import to handle new JSON format with metadata
 
-- [ ] **8.1** Review current `DictionaryImportParser` and `ImportController`
-- [ ] **8.2** Update parser to handle `pos_detail` object
-- [ ] **8.3** Update importer to merge `pos_detail`, `pos_type`, `lesson_introduced`, `function` into `form_metadata`
-- [ ] **8.4** Add support for `lexeme_of_hint` field (optional linking)
-- [ ] **8.5** Update `ImportController` to look up parent words by representation
-- [ ] **8.6** Set `lexeme_id` if parent found, leave NULL if not
-- [ ] **8.7** Update import tests to use new JSON format
-- [ ] **8.8** Test importing flat words (no lexeme_of_hint)
-- [ ] **8.9** Test importing linked words (with lexeme_of_hint)
-- [ ] **8.10** Run tests: `bundle exec rspec spec/services/dictionary_import_parser_spec.rb spec/requests/import_spec.rb`
+- [x] **8.1** Review current `DictionaryImportParser` and `ImportController`
+- [x] **8.2** Update parser to handle `pos_detail` object
+- [x] **8.3** Update importer to merge `pos_detail`, `pos_type`, `lesson_introduced`, `function` into `form_metadata`
+- [x] **8.4** Add support for `lexeme_of_hint` field (optional linking)
+- [x] **8.5** Update `ImportController` to look up parent words by representation
+- [x] **8.6** Set `lexeme_id` if parent found, leave NULL if not
+- [x] **8.7** Update import tests to use new JSON format
+- [x] **8.8** Test importing flat words (no lexeme_of_hint)
+- [x] **8.9** Test importing linked words (with lexeme_of_hint)
+- [x] **8.10** Run tests: `bundle exec rspec spec/services/dictionary_import_parser_spec.rb spec/requests/import_spec.rb`
 
 **Acceptance Criteria:**
-- Can import JSON with new format
-- Metadata stored correctly in form_metadata
-- lexeme_of_hint creates proper links when parent exists
-- Tests pass
+- ✅ Can import JSON with new format
+- ✅ Metadata stored correctly in form_metadata
+- ✅ lexeme_of_hint creates proper links when parent exists
+- ✅ Tests pass (292 examples, 0 failures)
 
 ---
 

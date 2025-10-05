@@ -161,6 +161,185 @@ RSpec.describe "Imports", type: :request do
         expect(response).to have_http_status(:unprocessable_content)
         expect(response.body).to include('No file provided')
       end
+
+      describe "JSON format import" do
+        let!(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
+        let!(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
+
+        it "imports word with metadata from JSON" do
+          json_content = <<~JSON
+            [
+              {
+                "word": "לָמַד",
+                "glosses": ["to learn", "to study"],
+                "pos": "Verb",
+                "pos_detail": {
+                  "binyan": "qal",
+                  "conjugation": "3MS"
+                }
+              }
+            ]
+          JSON
+
+          file = Rack::Test::UploadedFile.new(
+            StringIO.new(json_content),
+            'application/json',
+            original_filename: 'dictionary.json'
+          )
+
+          expect {
+            post import_path, params: { file: file }
+          }.to change(Word, :count).by(1)
+           .and change(Gloss, :count).by(2)
+
+          word = Word.find_by(representation: 'לָמַד')
+          expect(word.part_of_speech_category).to eq(verb_pos)
+          expect(word.binyan).to eq('qal')
+          expect(word.conjugation).to eq('3MS')
+          expect(word.glosses.pluck(:text)).to match_array([ 'to learn', 'to study' ])
+        end
+
+        it "merges all metadata fields into form_metadata" do
+          json_content = <<~JSON
+            [
+              {
+                "word": "בַּ֫יִת",
+                "lesson_introduced": 5,
+                "function": "a house",
+                "glosses": ["house"],
+                "pos_type": "Lexical Category",
+                "pos": "Noun",
+                "pos_detail": {
+                  "gender": "masculine",
+                  "number": "singular"
+                }
+              }
+            ]
+          JSON
+
+          file = Rack::Test::UploadedFile.new(
+            StringIO.new(json_content),
+            'application/json',
+            original_filename: 'dictionary.json'
+          )
+
+          post import_path, params: { file: file }
+
+          word = Word.find_by(representation: 'בַּ֫יִת')
+          expect(word.form_metadata['gender']).to eq('masculine')
+          expect(word.form_metadata['number']).to eq('singular')
+          expect(word.form_metadata['pos_type']).to eq('Lexical Category')
+          expect(word.form_metadata['lesson_introduced']).to eq(5)
+          expect(word.form_metadata['function']).to eq('a house')
+        end
+
+        it "links words using lexeme_of_hint" do
+          # First import the parent word
+          parent_json = <<~JSON
+            [
+              {
+                "word": "בַּ֫יִת",
+                "glosses": ["house"],
+                "pos": "Noun",
+                "pos_detail": {
+                  "number": "singular"
+                }
+              }
+            ]
+          JSON
+
+          file1 = Rack::Test::UploadedFile.new(
+            StringIO.new(parent_json),
+            'application/json',
+            original_filename: 'parent.json'
+          )
+
+          post import_path, params: { file: file1 }
+          parent = Word.find_by(representation: 'בַּ֫יִת')
+
+          # Then import the linked word
+          linked_json = <<~JSON
+            [
+              {
+                "word": "בָּתִּים",
+                "glosses": ["houses"],
+                "pos": "Noun",
+                "lexeme_of_hint": "בַּ֫יִת",
+                "pos_detail": {
+                  "number": "plural"
+                }
+              }
+            ]
+          JSON
+
+          file2 = Rack::Test::UploadedFile.new(
+            StringIO.new(linked_json),
+            'application/json',
+            original_filename: 'linked.json'
+          )
+
+          expect {
+            post import_path, params: { file: file2 }
+          }.to change(Word, :count).by(1)
+
+          linked_word = Word.find_by(representation: 'בָּתִּים')
+          expect(linked_word.lexeme_id).to eq(parent.id)
+          expect(linked_word.lexeme).to eq(parent)
+        end
+
+        it "handles lexeme_of_hint when parent doesn't exist yet" do
+          json_content = <<~JSON
+            [
+              {
+                "word": "בָּתִּים",
+                "glosses": ["houses"],
+                "pos": "Noun",
+                "lexeme_of_hint": "בַּ֫יִת",
+                "pos_detail": {
+                  "number": "plural"
+                }
+              }
+            ]
+          JSON
+
+          file = Rack::Test::UploadedFile.new(
+            StringIO.new(json_content),
+            'application/json',
+            original_filename: 'dictionary.json'
+          )
+
+          post import_path, params: { file: file }
+
+          word = Word.find_by(representation: 'בָּתִּים')
+          expect(word.lexeme_id).to be_nil  # Parent not found, lexeme_id stays null
+        end
+
+        it "raises error if POS category doesn't exist" do
+          json_content = <<~JSON
+            [
+              {
+                "word": "test",
+                "glosses": ["test"],
+                "pos": "NonexistentPOS",
+                "pos_detail": {}
+              }
+            ]
+          JSON
+
+          file = Rack::Test::UploadedFile.new(
+            StringIO.new(json_content),
+            'application/json',
+            original_filename: 'dictionary.json'
+          )
+
+          expect {
+            post import_path, params: { file: file }
+          }.not_to change(Word, :count)
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.body).to include('NonexistentPOS')
+        end
+      end
     end
 
     context "as regular user" do
