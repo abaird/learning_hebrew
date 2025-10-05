@@ -3,11 +3,60 @@
     <h1 class="font-bold text-4xl">Hebrew Dictionary</h1>
   </div>
 
+  <%= form_with url: dictionary_path, method: :get, class: "mb-6 space-y-4" do |form| %>
+    <div class="flex gap-4 items-end flex-wrap">
+      <div class="flex-1 min-w-[200px]">
+        <%= form.label :q, "Search", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :q, value: params[:q], placeholder: "Search words or definitions...", class: "block w-full rounded-md border border-gray-400 px-3 py-2" %>
+      </div>
+
+      <div class="w-48">
+        <%= form.label :pos_id, "Part of Speech", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :pos_id, options_from_collection_for_select(@pos_categories, :id, :name, params[:pos_id]), { include_blank: "All" }, class: "block w-full rounded-md border border-gray-400 px-3 py-2" %>
+      </div>
+
+      <div class="w-40">
+        <%= form.label :binyan, "Binyan", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :binyan, options_for_select(@binyans, params[:binyan]), { include_blank: "All" }, class: "block w-full rounded-md border border-gray-400 px-3 py-2" %>
+      </div>
+
+      <div class="w-40">
+        <%= form.label :number, "Number", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :number, options_for_select(@numbers, params[:number]), { include_blank: "All" }, class: "block w-full rounded-md border border-gray-400 px-3 py-2" %>
+      </div>
+
+      <div class="w-48">
+        <%= form.label :lesson, "Lesson", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <div class="flex gap-2">
+          <%= form.number_field :lesson, value: params[:lesson], placeholder: "Lesson #", class: "block w-24 rounded-md border border-gray-400 px-3 py-2" %>
+          <%= form.select :lesson_mode, [["Exact", "exact"], ["Or less", "or_less"]], { selected: params[:lesson_mode] || "exact" }, class: "block w-24 rounded-md border border-gray-400 px-3 py-2" %>
+        </div>
+      </div>
+
+      <div class="flex items-center">
+        <%= form.submit "Search", class: "rounded-md px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-medium cursor-pointer" %>
+      </div>
+
+      <% if params[:q].present? || params[:pos_id].present? || params[:binyan].present? || params[:number].present? || params[:lesson].present? || params[:show_all].present? %>
+        <div class="flex items-center">
+          <%= link_to "Clear", dictionary_path, class: "rounded-md px-4 py-2 bg-gray-200 hover:bg-gray-100 text-gray-700 font-medium" %>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="flex items-center">
+      <%= form.check_box :show_all, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" }, "true", nil %>
+      <%= form.label :show_all, "Show all words (including non-dictionary forms)", class: "ml-2 text-sm text-gray-700" %>
+    </div>
+  <% end %>
+
   <div class="space-y-2">
     <% @words.each do |word| %>
       <div class="pb-4">
         <div class="flex items-baseline flex-wrap" style="gap: 0.5rem">
-          <span class="text-3xl font-hebrew"><%= word.representation %></span>
+          <%= link_to word_path(word), class: "text-3xl font-hebrew hover:text-blue-600" do %>
+            <%= word.representation %>
+          <% end %>
           <% if word.pos_display.present? %>
             <span class="text-sm text-gray-600">(<%= word.pos_display %>)</span>
           <% end %>
@@ -21,6 +70,23 @@
             <span class="text-gray-500 italic">- No definitions yet</span>
           <% end %>
         </div>
+
+        <% if word.binyan.present? || word.conjugation.present? || word.number.present? || word.status.present? %>
+          <div class="mt-1 ml-4 text-sm text-gray-600 flex gap-3">
+            <% if word.binyan.present? %>
+              <span><strong>Binyan:</strong> <%= word.binyan %></span>
+            <% end %>
+            <% if word.conjugation.present? %>
+              <span><strong>Form:</strong> <%= word.conjugation %></span>
+            <% end %>
+            <% if word.number.present? %>
+              <span><strong>Number:</strong> <%= word.number %></span>
+            <% end %>
+            <% if word.status.present? %>
+              <span><strong>Status:</strong> <%= word.status %></span>
+            <% end %>
+          </div>
+        <% end %>
 
         <% if word.mnemonic.present? %>
           <div class="mt-1 ml-4 text-sm text-gray-600">

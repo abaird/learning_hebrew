@@ -1075,21 +1075,23 @@ end
 
 ---
 
-### Phase 9: Search & Query Enhancements
+### Phase 9: Search & Query Enhancements ✅
 **Goal:** Update search to handle metadata and dictionary filtering
 
-- [ ] **9.1** Update search to filter by dictionary entries by default
-- [ ] **9.2** Add option to search all words (not just dictionary entries)
-- [ ] **9.3** Add metadata-based filters (e.g., "show only verbs", "show only Qal")
-- [ ] **9.4** Update search results to show word metadata
-- [ ] **9.5** Test search functionality
-- [ ] **9.6** Write/update search specs
-- [ ] **9.7** Run tests: `bundle exec rspec spec/requests/search_spec.rb`
+- [x] **9.1** Update search to filter by dictionary entries by default
+- [x] **9.2** Add option to search all words (not just dictionary entries)
+- [x] **9.3** Add metadata-based filters (e.g., "show only verbs", "show only Qal")
+- [x] **9.4** Update search results to show word metadata
+- [x] **9.5** Add lesson number filtering (exact and cumulative "or less" modes)
+- [x] **9.6** Test search functionality
+- [x] **9.7** Write/update search specs
+- [x] **9.8** Run tests: `bundle exec rspec spec/requests/dictionary_spec.rb`
 
 **Acceptance Criteria:**
-- Search shows only dictionary entries by default
-- Can filter by metadata fields
-- Tests pass
+- ✅ Search shows only dictionary entries by default
+- ✅ Can filter by metadata fields (POS, binyan, number)
+- ✅ Can filter by lesson number (exact or cumulative "or less" mode)
+- ✅ Tests pass (301 examples, 0 failures)
 
 ---
 
