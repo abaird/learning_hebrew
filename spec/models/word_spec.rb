@@ -124,4 +124,29 @@ RSpec.describe Word, type: :model do
       expect(Word.hebrew_sort_key('abc')).to eq([ [ Float::INFINITY, 0 ] ])
     end
   end
+
+  describe 'form_metadata JSONB queries' do
+    it 'can query words by gender in form_metadata' do
+      # Create words with different genders in form_metadata
+      masculine_word = Word.create!(
+        representation: 'גָּדוֹל',
+        form_metadata: { gender: 'masculine' }
+      )
+      feminine_word = Word.create!(
+        representation: 'גְּדוֹלָה',
+        form_metadata: { gender: 'feminine' }
+      )
+      word_without_gender = Word.create!(
+        representation: 'שָׁלוֹם',
+        form_metadata: {}
+      )
+
+      # Query for masculine words using JSONB operator
+      results = Word.where("form_metadata->>'gender' = ?", 'masculine')
+
+      expect(results).to include(masculine_word)
+      expect(results).not_to include(feminine_word)
+      expect(results).not_to include(word_without_gender)
+    end
+  end
 end

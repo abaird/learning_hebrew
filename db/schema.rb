@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_04_182453) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_05_131201) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -87,7 +87,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_04_182453) do
     t.bigint "gender_id"
     t.bigint "verb_form_id"
     t.string "pos_display"
+    t.bigint "lexeme_id"
+    t.jsonb "form_metadata", default: {}, null: false
+    t.index ["form_metadata"], name: "index_words_on_form_metadata", using: :gin
     t.index ["gender_id"], name: "index_words_on_gender_id"
+    t.index ["lexeme_id"], name: "index_words_on_lexeme_id"
     t.index ["part_of_speech_category_id"], name: "index_words_on_part_of_speech_category_id"
     t.index ["verb_form_id"], name: "index_words_on_verb_form_id"
   end
@@ -99,4 +103,5 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_04_182453) do
   add_foreign_key "words", "genders"
   add_foreign_key "words", "part_of_speech_categories"
   add_foreign_key "words", "verb_forms"
+  add_foreign_key "words", "words", column: "lexeme_id"
 end
