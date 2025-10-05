@@ -111,6 +111,9 @@ RSpec.describe "/words", type: :request do
   context "as a superuser" do
     before { sign_in superuser_account }
 
+    let(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
+    let(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
+
     include_examples "accessible to all authenticated users"
 
     describe "GET /new" do
@@ -202,9 +205,6 @@ RSpec.describe "/words", type: :request do
     end
 
     describe "GET /show with forms and lexeme relationships" do
-      let(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
-      let(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
-
       it "displays linked forms on the parent word's page" do
         # Create a parent word (dictionary entry)
         parent = Word.create!(
@@ -336,6 +336,120 @@ RSpec.describe "/words", type: :request do
 
         expect(response).to be_successful
         expect(response.body).to include("id=\"form-#{form.id}\"")
+      end
+    end
+
+    describe "POST /create with metadata" do
+      it "creates a standalone word with metadata" do
+        expect {
+          post words_url, params: {
+            word: {
+              representation: "לָמַד",
+              part_of_speech_category_id: verb_pos.id,
+              conjugation: "3MS",
+              binyan: "qal",
+              aspect: "perfective"
+            }
+          }
+        }.to change(Word, :count).by(1)
+
+        word = Word.last
+        expect(word.conjugation).to eq("3MS")
+        expect(word.binyan).to eq("qal")
+        expect(word.aspect).to eq("perfective")
+        expect(word.lexeme_id).to be_nil
+      end
+
+      it "creates a linked word with lexeme_id and metadata" do
+        parent = Word.create!(
+          representation: 'לָמַד',
+          part_of_speech_category: verb_pos,
+          form_metadata: { conjugation: '3MS', binyan: 'qal' }
+        )
+
+        expect {
+          post words_url, params: {
+            word: {
+              representation: "לָמַדְתִּי",
+              part_of_speech_category_id: verb_pos.id,
+              lexeme_id: parent.id,
+              conjugation: "1CS",
+              binyan: "qal",
+              aspect: "perfective"
+            }
+          }
+        }.to change(Word, :count).by(1)
+
+        word = Word.last
+        expect(word.lexeme_id).to eq(parent.id)
+        expect(word.conjugation).to eq("1CS")
+        expect(word.binyan).to eq("qal")
+      end
+
+      it "creates a noun with number and status metadata" do
+        expect {
+          post words_url, params: {
+            word: {
+              representation: "בֵּן",
+              part_of_speech_category_id: noun_pos.id,
+              number: "singular",
+              status: "absolute"
+            }
+          }
+        }.to change(Word, :count).by(1)
+
+        word = Word.last
+        expect(word.number).to eq("singular")
+        expect(word.status).to eq("absolute")
+      end
+    end
+
+    describe "PATCH /update with metadata" do
+      it "updates metadata fields" do
+        word = Word.create!(
+          representation: "לָמַד",
+          part_of_speech_category: verb_pos,
+          form_metadata: { conjugation: '3MS' }
+        )
+
+        patch word_url(word), params: {
+          word: {
+            conjugation: "3MS",
+            binyan: "qal",
+            aspect: "perfective",
+            root: "למד"
+          }
+        }
+
+        word.reload
+        expect(word.conjugation).to eq("3MS")
+        expect(word.binyan).to eq("qal")
+        expect(word.aspect).to eq("perfective")
+        expect(word.root).to eq("למד")
+      end
+
+      it "can link a word to a parent" do
+        parent = Word.create!(
+          representation: 'בֵּן',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'singular' }
+        )
+
+        word = Word.create!(
+          representation: 'בָּנִים',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'plural' }
+        )
+
+        patch word_url(word), params: {
+          word: {
+            lexeme_id: parent.id
+          }
+        }
+
+        word.reload
+        expect(word.lexeme_id).to eq(parent.id)
+        expect(word.lexeme).to eq(parent)
       end
     end
   end

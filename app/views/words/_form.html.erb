@@ -38,6 +38,74 @@
   </div>
 
   <div class="my-5">
+    <%= form.label :lexeme_id, "Parent Word (Lexeme)" %>
+    <%= form.collection_select :lexeme_id, Word.where(lexeme_id: nil).order(:representation), :id, :representation,
+      { include_blank: "(standalone word)", selected: word.lexeme_id },
+      { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full font-hebrew" } %>
+    <p class="mt-1 text-sm text-gray-500">Link this word to a parent word if it's a form (conjugation, plural, etc.)</p>
+  </div>
+
+  <div class="my-5 border-t pt-5">
+    <h3 class="text-lg font-semibold mb-3">Metadata Fields</h3>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div>
+        <%= form.label :conjugation, "Conjugation (e.g., 3MS, 1CS)" %>
+        <%= form.text_field :conjugation, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+
+      <div>
+        <%= form.label :binyan, "Binyan" %>
+        <%= form.select :binyan,
+          ['qal', 'niphal', 'piel', 'pual', 'hiphil', 'hophal', 'hitpael'],
+          { include_blank: "(not set)" },
+          { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
+      </div>
+
+      <div>
+        <%= form.label :aspect, "Aspect/Tense" %>
+        <%= form.select :aspect,
+          ['perfective', 'imperfective', 'imperative', 'jussive', 'vayyiqtol', 'veqatal', 'infinitive', 'active', 'passive'],
+          { include_blank: "(not set)" },
+          { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
+      </div>
+
+      <div>
+        <%= form.label :person, "Person (1, 2, 3)" %>
+        <%= form.select :person, ['1', '2', '3'],
+          { include_blank: "(not set)" },
+          { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
+      </div>
+
+      <div>
+        <%= form.label :number, "Number" %>
+        <%= form.select :number,
+          ['singular', 'plural', 'dual', 'form only plural'],
+          { include_blank: "(not set)" },
+          { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
+      </div>
+
+      <div>
+        <%= form.label :status, "Status" %>
+        <%= form.select :status,
+          ['absolute', 'construct', 'determined', 'suffixed'],
+          { include_blank: "(not set)" },
+          { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
+      </div>
+
+      <div>
+        <%= form.label :root, "Root (3-consonant)" %>
+        <%= form.text_field :root, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full font-hebrew" %>
+      </div>
+
+      <div>
+        <%= form.label :weakness, "Weakness (e.g., 1-Nun, 3-He)" %>
+        <%= form.text_field :weakness, class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="my-5">
     <%= form.label :mnemonic %>
     <%= form.textarea :mnemonic, rows: 4, class: ["block shadow-sm rounded-md border px-3 py-2 mt-2 w-full", {"border-gray-400 focus:outline-blue-600": word.errors[:mnemonic].none?, "border-red-400 focus:outline-red-600": word.errors[:mnemonic].any?}] %>
   </div>

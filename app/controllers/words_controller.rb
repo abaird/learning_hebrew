@@ -93,6 +93,24 @@ class WordsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def word_params
-      params.expect(word: [ :representation, :part_of_speech_category_id, :gender_id, :verb_form_id, :mnemonic, :pronunciation_url, :picture_url, deck_ids: [] ])
+      params.expect(word: [
+        :representation,
+        :part_of_speech_category_id,
+        :gender_id,
+        :verb_form_id,
+        :mnemonic,
+        :pronunciation_url,
+        :picture_url,
+        :lexeme_id,
+        :conjugation,
+        :binyan,
+        :aspect,
+        :person,
+        :number,
+        :status,
+        :root,
+        :weakness,
+        deck_ids: []
+      ])
     end
 end

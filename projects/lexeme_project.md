@@ -1030,26 +1030,26 @@ end
 
 ---
 
-### Phase 7: Word Form UI
+### Phase 7: Word Form UI ✅
 **Goal:** Enable creating/editing words with metadata through UI
 
-- [ ] **7.1** Update `app/views/words/_form.html.erb` to include metadata fields
-- [ ] **7.2** Add lexeme selection dropdown (for linking words)
-- [ ] **7.3** Add conditional field visibility based on POS category
-- [ ] **7.4** Add fields for common metadata: gender, number, status, conjugation, etc.
-- [ ] **7.5** Update `WordsController` strong params to permit metadata fields
-- [ ] **7.6** Add Stimulus controller for dynamic field visibility (optional)
-- [ ] **7.7** Test creating standalone word through UI
-- [ ] **7.8** Test creating linked word through UI
-- [ ] **7.9** Test editing word metadata
-- [ ] **7.10** Write/update request specs
-- [ ] **7.11** Run tests: `bundle exec rspec spec/requests/words_spec.rb`
+- [x] **7.1** Update `app/views/words/_form.html.erb` to include metadata fields
+- [x] **7.2** Add lexeme selection dropdown (for linking words)
+- [x] **7.3** Add conditional field visibility based on POS category
+- [x] **7.4** Add fields for common metadata: gender, number, status, conjugation, etc.
+- [x] **7.5** Update `WordsController` strong params to permit metadata fields
+- [x] **7.6** Add Stimulus controller for dynamic field visibility (optional)
+- [x] **7.7** Test creating standalone word through UI
+- [x] **7.8** Test creating linked word through UI
+- [x] **7.9** Test editing word metadata
+- [x] **7.10** Write/update request specs
+- [x] **7.11** Run tests: `bundle exec rspec spec/requests/words_spec.rb`
 
 **Acceptance Criteria:**
-- Can create words with metadata through web form
-- Can link words to parent via dropdown
-- Metadata saves correctly to form_metadata JSONB
-- Tests pass
+- ✅ Can create words with metadata through web form
+- ✅ Can link words to parent via dropdown
+- ✅ Metadata saves correctly to form_metadata JSONB
+- ✅ Tests pass (278 examples, 0 failures)
 
 ---
 
