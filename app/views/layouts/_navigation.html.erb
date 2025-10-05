@@ -14,7 +14,7 @@
       <% if user_signed_in? %>
         <!-- Main Navigation Links -->
         <div class="flex items-center space-x-1">
-          <%= link_to dictionary_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(words_path) ? 'bg-blue-700' : ''}" do %>
+          <%= link_to dictionary_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(dictionary_path) ? 'bg-blue-700' : ''}" do %>
             Dictionary
           <% end %>
 
