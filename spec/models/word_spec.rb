@@ -336,4 +336,115 @@ RSpec.describe Word, type: :model do
       expect(results).not_to include(plural_noun)
     end
   end
+
+  describe '#parent_word' do
+    let(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
+
+    it 'returns self for standalone words (no lexeme_id)' do
+      word = Word.create!(
+        representation: 'בֵּן',
+        part_of_speech_category: noun_pos,
+        form_metadata: { number: 'singular' }
+      )
+      expect(word.parent_word).to eq(word)
+    end
+
+    it 'returns the lexeme for word forms (with lexeme_id)' do
+      parent = Word.create!(
+        representation: 'בֵּן',
+        part_of_speech_category: noun_pos,
+        form_metadata: { number: 'singular' }
+      )
+      form = Word.create!(
+        representation: 'בָּנִים',
+        part_of_speech_category: noun_pos,
+        lexeme_id: parent.id,
+        form_metadata: { number: 'plural' }
+      )
+      expect(form.parent_word).to eq(parent)
+    end
+  end
+
+  describe '#form_description' do
+    let(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
+    let(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
+
+    it 'returns "Dictionary entry" for dictionary entry words' do
+      word = Word.create!(
+        representation: 'לָמַד',
+        part_of_speech_category: verb_pos,
+        form_metadata: { conjugation: '3MS' }
+      )
+      expect(word.form_description).to eq('Dictionary entry')
+    end
+
+    it 'describes verb conjugations with binyan, aspect, and conjugation' do
+      word = Word.create!(
+        representation: 'לָמַדְתִּי',
+        part_of_speech_category: verb_pos,
+        form_metadata: { binyan: 'qal', aspect: 'perfective', conjugation: '1CS' }
+      )
+      expect(word.form_description).to eq('qal perfective 1CS')
+    end
+
+    it 'describes plural nouns' do
+      word = Word.create!(
+        representation: 'בָּנִים',
+        part_of_speech_category: noun_pos,
+        form_metadata: { number: 'plural' }
+      )
+      expect(word.form_description).to eq('plural form')
+    end
+
+    it 'describes plural nouns with status' do
+      word = Word.create!(
+        representation: 'בְּנֵי',
+        part_of_speech_category: noun_pos,
+        form_metadata: { number: 'plural', status: 'construct' }
+      )
+      expect(word.form_description).to eq('plural construct')
+    end
+
+    it 'describes construct state nouns' do
+      word = Word.create!(
+        representation: 'בֶּן',
+        part_of_speech_category: noun_pos,
+        form_metadata: { status: 'construct', number: 'singular' }
+      )
+      expect(word.form_description).to eq('construct singular')
+    end
+
+    it 'returns "variant" for other forms without specific metadata' do
+      word = Word.create!(
+        representation: 'שָׁלוֹם',
+        part_of_speech_category: noun_pos,
+        form_metadata: {}
+      )
+      # This word has no metadata markers, so it's not a dictionary entry by default rules
+      # but it also has no conjugation/plural/construct markers
+      expect(word.form_description).to eq('variant')
+    end
+  end
+
+  describe '#full_display_name' do
+    let(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
+
+    it 'returns only representation for dictionary entries' do
+      word = Word.create!(
+        representation: 'לָמַד',
+        part_of_speech_category: verb_pos,
+        form_metadata: { conjugation: '3MS' }
+      )
+      expect(word.full_display_name).to eq('לָמַד')
+    end
+
+    it 'includes form description in parentheses for non-dictionary entries' do
+      word = Word.create!(
+        representation: 'לָמַדְתִּי',
+        part_of_speech_category: verb_pos,
+        form_metadata: { binyan: 'qal', aspect: 'perfective', conjugation: '1CS' }
+      )
+      expect(word.full_display_name).to eq('לָמַדְתִּי (qal perfective 1CS)')
+    end
+  end
 end

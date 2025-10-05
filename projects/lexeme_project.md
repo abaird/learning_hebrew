@@ -974,19 +974,19 @@ end
 
 ---
 
-### Phase 4: Helper Methods
+### Phase 4: Helper Methods ✅
 **Goal:** Add helper methods for word display and description
 
-- [ ] **4.1** Add `parent_word` method (returns self if standalone, else returns lexeme)
-- [ ] **4.2** Add `form_description` method (describes grammatical features from metadata)
-- [ ] **4.3** Add `full_display_name` method (combines representation + form description)
-- [ ] **4.4** Write tests for helper methods
-- [ ] **4.5** Run tests: `bundle exec rspec spec/models/word_spec.rb`
+- [x] **4.1** Add `parent_word` method (returns self if standalone, else returns lexeme)
+- [x] **4.2** Add `form_description` method (describes grammatical features from metadata)
+- [x] **4.3** Add `full_display_name` method (combines representation + form description)
+- [x] **4.4** Write tests for helper methods
+- [x] **4.5** Run tests: `bundle exec rspec spec/models/word_spec.rb`
 
 **Acceptance Criteria:**
-- `word.form_description` returns appropriate string (e.g., "qal perfective 1CS")
-- `word.parent_word` returns correct word
-- Tests pass
+- ✅ `word.form_description` returns appropriate string (e.g., "qal perfective 1CS")
+- ✅ `word.parent_word` returns correct word
+- ✅ Tests pass (263 examples, 0 failures)
 
 ---
 

@@ -126,8 +126,9 @@ class Word < ApplicationRecord
       form_metadata["conjugation"] == "3MS"
 
     when "Noun", "Proper Noun"
-      # Only singular forms are dictionary entries
-      form_metadata["number"] == "singular"
+      # Only singular forms in absolute state (or unspecified status) are dictionary entries
+      # Construct state nouns are not dictionary entries
+      form_metadata["number"] == "singular" && form_metadata["status"] != "construct"
 
     when "Adjective"
       # Only masculine singular is dictionary entry
@@ -155,6 +156,45 @@ class Word < ApplicationRecord
       # Default: show in dictionary if no lexeme_id
       true
     end
+  end
+
+  # Returns the parent word (lexeme) if this is a form, otherwise returns self
+  def parent_word
+    lexeme_id.present? ? lexeme : self
+  end
+
+  # Describes the grammatical form of this word based on metadata
+  # Returns "Dictionary entry" for dictionary entries, or a descriptive string for forms
+  def form_description
+    return "Dictionary entry" if is_dictionary_entry?
+
+    # Describe the form based on metadata
+    if form_metadata["conjugation"].present?
+      # Verb conjugation
+      parts = [
+        form_metadata["binyan"],
+        form_metadata["aspect"],
+        form_metadata["conjugation"]
+      ].compact
+      parts.join(" ")
+    elsif form_metadata["number"] == "plural"
+      # Plural noun/adjective
+      "plural #{form_metadata["status"] || "form"}"
+    elsif form_metadata["status"] == "construct"
+      # Construct state
+      "construct #{form_metadata["number"] || "form"}"
+    else
+      # Generic description
+      "variant"
+    end
+  end
+
+  # Returns the full display name with form description for non-dictionary entries
+  # Example: "לָמַדְתִּי (qal perfective 1CS)" or "גָּדוֹל" (dictionary entry)
+  def full_display_name
+    parts = [ representation ]
+    parts << "(#{form_description})" unless is_dictionary_entry?
+    parts.join(" ")
   end
 
   private
