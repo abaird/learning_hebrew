@@ -912,65 +912,65 @@ end
 
 ## Implementation Checklist
 
-### Phase 1: Database Migration
+### Phase 1: Database Migration ✅
 **Goal:** Add new columns to support lexeme/form relationships without breaking existing functionality
 
-- [ ] **1.1** Create migration file: `db/migrate/YYYYMMDDHHMMSS_add_lexeme_system_to_words.rb`
-- [ ] **1.2** Add `lexeme_id` reference column (nullable, references words table)
-- [ ] **1.3** Add index on `lexeme_id`
-- [ ] **1.4** Add `form_metadata` JSONB column (default: `{}`, not null)
-- [ ] **1.5** Add GIN index on `form_metadata` for fast JSONB queries
-- [ ] **1.6** Run migration in development: `bin/rails db:migrate`
-- [ ] **1.7** Verify schema changes: `bin/rails db:schema:dump`
-- [ ] **1.8** Run existing test suite: `bundle exec rspec` (should still pass)
+- [x] **1.1** Create migration file: `db/migrate/YYYYMMDDHHMMSS_add_lexeme_system_to_words.rb`
+- [x] **1.2** Add `lexeme_id` reference column (nullable, references words table)
+- [x] **1.3** Add index on `lexeme_id`
+- [x] **1.4** Add `form_metadata` JSONB column (default: `{}`, not null)
+- [x] **1.5** Add GIN index on `form_metadata` for fast JSONB queries
+- [x] **1.6** Run migration in development: `bin/rails db:migrate`
+- [x] **1.7** Verify schema changes: `bin/rails db:schema:dump`
+- [x] **1.8** Run existing test suite: `bundle exec rspec` (should still pass)
 
 **Acceptance Criteria:**
-- New columns exist in schema
-- All existing tests pass (no breaking changes)
-- Can query `Word.where("form_metadata->>'gender' = ?", 'masculine')`
+- ✅ New columns exist in schema
+- ✅ All existing tests pass (no breaking changes)
+- ✅ Can query `Word.where("form_metadata->>'gender' = ?", 'masculine')`
 
 ---
 
-### Phase 2: Model Associations & Accessors
+### Phase 2: Model Associations & Accessors ✅
 **Goal:** Update Word model with new associations and JSONB accessors
 
-- [ ] **2.1** Add self-referential associations to `app/models/word.rb`:
+- [x] **2.1** Add self-referential associations to `app/models/word.rb`:
   - `belongs_to :lexeme, class_name: 'Word', optional: true`
   - `has_many :forms, class_name: 'Word', foreign_key: :lexeme_id, dependent: :nullify`
-- [ ] **2.2** Add `store_accessor :form_metadata` with all fields (pos_type, lesson_introduced, function, root, binyan, aspect, etc.)
-- [ ] **2.3** Update validations:
+- [x] **2.2** Add `store_accessor :form_metadata` with all fields (pos_type, lesson_introduced, function, root, binyan, aspect, etc.)
+- [x] **2.3** Update validations:
   - `validates :representation, presence: true`
-  - `validates :form_metadata, presence: true`
-- [ ] **2.4** Add scopes:
+  - Note: form_metadata validation not needed (NOT NULL with default in DB)
+- [x] **2.4** Add scopes:
   - `scope :word_forms, -> { where.not(lexeme_id: nil) }`
-- [ ] **2.5** Run tests: `bundle exec rspec spec/models/word_spec.rb`
+- [x] **2.5** Run tests: `bundle exec rspec spec/models/word_spec.rb`
 
 **Acceptance Criteria:**
-- Can access metadata fields via accessors: `word.gender`, `word.binyan`, etc.
-- Associations work: `parent.forms` returns linked words
-- Tests pass
+- ✅ Can access metadata fields via accessors: `word.gender_meta`, `word.binyan`, etc.
+- ✅ Associations work: `parent.forms` returns linked words
+- ✅ Tests pass
 
 ---
 
-### Phase 3: Dictionary Entry Logic
+### Phase 3: Dictionary Entry Logic ✅
 **Goal:** Implement `is_dictionary_entry?` method with POS-specific rules
 
-- [ ] **3.1** Add `is_dictionary_entry?` method to Word model
-- [ ] **3.2** Implement rules for Verbs (only 3MS with `lexeme_id: nil`)
-- [ ] **3.3** Implement rules for Nouns (only singular with `lexeme_id: nil`)
-- [ ] **3.4** Implement rules for Adjectives (only masculine singular with `lexeme_id: nil`)
-- [ ] **3.5** Implement rules for Participles (only masculine singular active with `lexeme_id: nil`)
-- [ ] **3.6** Implement rules for Pronouns/Functional words (all are dictionary entries)
-- [ ] **3.7** Implement rules for Consonants (all are dictionary entries)
-- [ ] **3.8** Add `dictionary_entries` scope (filters by `is_dictionary_entry?`)
-- [ ] **3.9** Write model tests for `is_dictionary_entry?` logic
-- [ ] **3.10** Run tests: `bundle exec rspec spec/models/word_spec.rb`
+- [x] **3.1** Add `is_dictionary_entry?` method to Word model
+- [x] **3.2** Implement rules for Verbs (only 3MS with `lexeme_id: nil`)
+- [x] **3.3** Implement rules for Nouns (only singular with `lexeme_id: nil`)
+- [x] **3.4** Implement rules for Adjectives (only masculine singular with `lexeme_id: nil`)
+- [x] **3.5** Implement rules for Participles (only masculine singular active with `lexeme_id: nil`)
+- [x] **3.6** Implement rules for Pronouns/Functional words (all are dictionary entries)
+- [x] **3.7** Implement rules for Consonants (all are dictionary entries)
+- [x] **3.8** Add `dictionary_entries` scope (filters by `is_dictionary_entry?`)
+- [x] **3.9** Write model tests for `is_dictionary_entry?` logic
+- [x] **3.10** Run tests: `bundle exec rspec spec/models/word_spec.rb`
 
 **Acceptance Criteria:**
-- `Word.dictionary_entries` returns only appropriate words
-- 3MS verbs return true, 1CS verbs return false
-- Singular nouns return true, plural nouns return false
-- Tests cover all POS categories
+- ✅ `Word.dictionary_entries` returns only appropriate words
+- ✅ 3MS verbs return true, 1CS verbs return false
+- ✅ Singular nouns return true, plural nouns return false
+- ✅ Tests cover all POS categories
 
 ---
 

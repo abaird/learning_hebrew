@@ -149,4 +149,191 @@ RSpec.describe Word, type: :model do
       expect(results).not_to include(word_without_gender)
     end
   end
+
+  describe '#is_dictionary_entry?' do
+    let(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
+    let(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
+    let(:adjective_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Adjective') { |pos| pos.abbrev = 'adj' } }
+    let(:participle_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Participle') { |pos| pos.abbrev = 'ptcp' } }
+    let(:pronoun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Pronoun') { |pos| pos.abbrev = 'pron' } }
+
+    context 'for verbs' do
+      it 'returns true for 3MS verbs without lexeme_id' do
+        word = Word.create!(
+          representation: 'לָמַד',
+          part_of_speech_category: verb_pos,
+          form_metadata: { conjugation: '3MS' }
+        )
+        expect(word.is_dictionary_entry?).to be true
+      end
+
+      it 'returns false for non-3MS verbs without lexeme_id' do
+        word = Word.create!(
+          representation: 'לָמַדְתִּי',
+          part_of_speech_category: verb_pos,
+          form_metadata: { conjugation: '1CS' }
+        )
+        expect(word.is_dictionary_entry?).to be false
+      end
+
+      it 'returns false for 3MS verbs with lexeme_id (forms)' do
+        parent = Word.create!(
+          representation: 'לָמַד',
+          part_of_speech_category: verb_pos,
+          form_metadata: { conjugation: '3MS' }
+        )
+        form = Word.create!(
+          representation: 'לָמַדְתִּי',
+          part_of_speech_category: verb_pos,
+          lexeme_id: parent.id,
+          form_metadata: { conjugation: '1CS' }
+        )
+        expect(form.is_dictionary_entry?).to be false
+      end
+    end
+
+    context 'for nouns' do
+      it 'returns true for singular nouns without lexeme_id' do
+        word = Word.create!(
+          representation: 'בֵּן',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'singular' }
+        )
+        expect(word.is_dictionary_entry?).to be true
+      end
+
+      it 'returns false for plural nouns without lexeme_id' do
+        word = Word.create!(
+          representation: 'בָּנִים',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'plural' }
+        )
+        expect(word.is_dictionary_entry?).to be false
+      end
+    end
+
+    context 'for adjectives' do
+      it 'returns true for masculine singular adjectives without lexeme_id' do
+        word = Word.create!(
+          representation: 'גָּדוֹל',
+          part_of_speech_category: adjective_pos,
+          form_metadata: { gender: 'masculine', number: 'singular' }
+        )
+        expect(word.is_dictionary_entry?).to be true
+      end
+
+      it 'returns false for feminine singular adjectives' do
+        word = Word.create!(
+          representation: 'גְּדוֹלָה',
+          part_of_speech_category: adjective_pos,
+          form_metadata: { gender: 'feminine', number: 'singular' }
+        )
+        expect(word.is_dictionary_entry?).to be false
+      end
+
+      it 'returns false for masculine plural adjectives' do
+        word = Word.create!(
+          representation: 'גְּדֹלִים',
+          part_of_speech_category: adjective_pos,
+          form_metadata: { gender: 'masculine', number: 'plural' }
+        )
+        expect(word.is_dictionary_entry?).to be false
+      end
+    end
+
+    context 'for participles' do
+      it 'returns true for masculine singular active participles' do
+        word = Word.create!(
+          representation: 'יֹשֵׁב',
+          part_of_speech_category: participle_pos,
+          form_metadata: { gender: 'masculine', number: 'singular', aspect: 'active' }
+        )
+        expect(word.is_dictionary_entry?).to be true
+      end
+
+      it 'returns false for feminine singular active participles' do
+        word = Word.create!(
+          representation: 'יוֹשֶׁ֫בֶת',
+          part_of_speech_category: participle_pos,
+          form_metadata: { gender: 'feminine', number: 'singular', aspect: 'active' }
+        )
+        expect(word.is_dictionary_entry?).to be false
+      end
+
+      it 'returns false for masculine singular passive participles' do
+        word = Word.create!(
+          representation: 'כָּתוּב',
+          part_of_speech_category: participle_pos,
+          form_metadata: { gender: 'masculine', number: 'singular', aspect: 'passive' }
+        )
+        expect(word.is_dictionary_entry?).to be false
+      end
+    end
+
+    context 'for pronouns and functional words' do
+      it 'returns true for all pronouns' do
+        word = Word.create!(
+          representation: 'אֲנִי',
+          part_of_speech_category: pronoun_pos,
+          form_metadata: {}
+        )
+        expect(word.is_dictionary_entry?).to be true
+      end
+    end
+
+    context 'for words with lexeme_id' do
+      it 'always returns false regardless of metadata' do
+        parent = Word.create!(
+          representation: 'בֵּן',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'singular' }
+        )
+        form = Word.create!(
+          representation: 'בָּנִים',
+          part_of_speech_category: noun_pos,
+          lexeme_id: parent.id,
+          form_metadata: { number: 'plural' }
+        )
+        expect(form.is_dictionary_entry?).to be false
+      end
+    end
+  end
+
+  describe '.dictionary_entries scope' do
+    let(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
+    let(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
+
+    it 'returns only words that are dictionary entries' do
+      # Dictionary entries
+      verb_3ms = Word.create!(
+        representation: 'לָמַד',
+        part_of_speech_category: verb_pos,
+        form_metadata: { conjugation: '3MS' }
+      )
+      singular_noun = Word.create!(
+        representation: 'בֵּן',
+        part_of_speech_category: noun_pos,
+        form_metadata: { number: 'singular' }
+      )
+
+      # Not dictionary entries
+      verb_1cs = Word.create!(
+        representation: 'לָמַדְתִּי',
+        part_of_speech_category: verb_pos,
+        form_metadata: { conjugation: '1CS' }
+      )
+      plural_noun = Word.create!(
+        representation: 'בָּנִים',
+        part_of_speech_category: noun_pos,
+        form_metadata: { number: 'plural' }
+      )
+
+      results = Word.dictionary_entries
+
+      expect(results).to include(verb_3ms)
+      expect(results).to include(singular_noun)
+      expect(results).not_to include(verb_1cs)
+      expect(results).not_to include(plural_noun)
+    end
+  end
 end

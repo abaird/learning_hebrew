@@ -1,4 +1,8 @@
 class Word < ApplicationRecord
+  # Self-referential associations for lexeme/form relationships
+  belongs_to :lexeme, class_name: "Word", optional: true
+  has_many :forms, class_name: "Word", foreign_key: :lexeme_id, dependent: :nullify
+
   has_many :deck_words, dependent: :destroy
   has_many :decks, through: :deck_words
   has_many :glosses, dependent: :destroy
@@ -6,6 +10,44 @@ class Word < ApplicationRecord
   belongs_to :part_of_speech_category, optional: true
   belongs_to :gender, optional: true
   belongs_to :verb_form, optional: true
+
+  # JSONB store accessors for form_metadata
+  store_accessor :form_metadata,
+    # Import fields
+    :pos_type,            # "Lexical Category", "Functional Category", "Other/Base"
+    :lesson_introduced,   # Lesson number
+    :function,            # Functional description
+
+    # Verb fields
+    :root,                # 3-consonant root (e.g., "למד")
+    :binyan,              # qal, niphal, piel, pual, hiphil, hophal, hitpael
+    :aspect,              # perfective, imperfective, imperative, jussive, etc.
+    :conjugation,         # 3MS, 1CS, etc. (person+gender+number combined)
+    :person,              # 1, 2, 3
+    :weakness,            # 1-Nun, 3-He, 2-Vav (Hollow), etc.
+
+    # Noun/Adjective fields
+    :number,              # singular, plural, dual, form only plural
+    :status,              # absolute, construct, determined
+    :specific_type,       # collective, epicene, uncountable, irregular plural
+    :definiteness_agreement, # For adjectives
+
+    # Participle fields
+    :verbal_root,         # Link to base verb
+
+    # Pronoun fields
+    :sub_type,            # Demonstrative, Personal, Interrogative, etc.
+
+    # Functional word fields
+    :grammatical_role,    # inseparable prefix, object marker, etc.
+
+    # General fields
+    :gender_meta,         # masculine, feminine, common (used across nouns, adjectives, pronouns, etc.)
+    :category,            # descriptive, cardinal number, ordinal number, etc.
+    :variant_type,        # plene, defective, modern, ancient
+    :notes,               # Additional notes
+    :name,                # Letter name (for consonants)
+    :transliteration      # Romanization
 
   validates :representation, presence: true
 
@@ -30,6 +72,10 @@ class Word < ApplicationRecord
 
   scope :alphabetically, -> {
     all.sort_by { |word| hebrew_sort_key(word.representation) }
+  }
+  scope :word_forms, -> { where.not(lexeme_id: nil) }
+  scope :dictionary_entries, -> {
+    where(lexeme_id: nil).select { |w| w.is_dictionary_entry? }
   }
 
   def self.hebrew_sort_key(hebrew_text)
@@ -65,6 +111,50 @@ class Word < ApplicationRecord
     parts << gender.abbrev if gender.present?
     parts << verb_form.abbrev if verb_form.present?
     parts.join(".")
+  end
+
+  # Determines if this word should appear in dictionary listings
+  # Based on POS category and metadata (not a database field)
+  def is_dictionary_entry?
+    # Forms are never dictionary entries
+    return false if lexeme_id.present?
+
+    # Determine based on POS category and metadata
+    case part_of_speech_category&.name
+    when "Verb"
+      # Only 3MS (3rd person masculine singular) is dictionary entry
+      form_metadata["conjugation"] == "3MS"
+
+    when "Noun", "Proper Noun"
+      # Only singular forms are dictionary entries
+      form_metadata["number"] == "singular"
+
+    when "Adjective"
+      # Only masculine singular is dictionary entry
+      form_metadata["gender"] == "masculine" && form_metadata["number"] == "singular"
+
+    when "Participle"
+      # Only masculine singular active is dictionary entry
+      form_metadata["gender"] == "masculine" &&
+        form_metadata["number"] == "singular" &&
+        form_metadata["aspect"] == "active"
+
+    when "Pronoun", "Interrogative Pronoun"
+      # All pronouns are dictionary entries (each is distinct)
+      true
+
+    when "Preposition", "Conjunction", "Article", "Particle", "Adverb/Particle"
+      # All functional words are dictionary entries
+      true
+
+    when "Consonant"
+      # All consonants are dictionary entries
+      true
+
+    else
+      # Default: show in dictionary if no lexeme_id
+      true
+    end
   end
 
   private
