@@ -43,3 +43,6 @@ k8s/secrets-local.yaml
 # Tilt
 .tiltbuild/
 tilt_modules/
+
+vocab/*
+.claude/settings.local.yaml

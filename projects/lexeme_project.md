@@ -990,21 +990,21 @@ end
 
 ---
 
-### Phase 5: Dictionary Controller Updates
+### Phase 5: Dictionary Controller Updates ✅
 **Goal:** Update dictionary to show only dictionary entry words
 
-- [ ] **5.1** Update `DictionaryController#index` to use filtered query
-- [ ] **5.2** Filter by `is_dictionary_entry?` (may need to load all and filter in Ruby initially)
-- [ ] **5.3** Update eager loading to include metadata needed for filtering
-- [ ] **5.4** Test dictionary page manually (verify only appropriate words show)
-- [ ] **5.5** Write/update request specs for dictionary
-- [ ] **5.6** Run tests: `bundle exec rspec spec/requests/dictionary_spec.rb`
+- [x] **5.1** Update `DictionaryController#index` to use filtered query
+- [x] **5.2** Filter by `is_dictionary_entry?` (may need to load all and filter in Ruby initially)
+- [x] **5.3** Update eager loading to include metadata needed for filtering
+- [x] **5.4** Test dictionary page manually (verify only appropriate words show)
+- [x] **5.5** Write/update request specs for dictionary
+- [x] **5.6** Run tests: `bundle exec rspec spec/requests/dictionary_spec.rb`
 
 **Acceptance Criteria:**
-- Dictionary page shows only 3MS verbs, singular nouns, etc.
-- No plural forms or non-3MS verbs appear
-- Page loads in reasonable time
-- Tests pass
+- ✅ Dictionary page shows only 3MS verbs, singular nouns, etc.
+- ✅ No plural forms or non-3MS verbs appear
+- ✅ Page loads in reasonable time
+- ✅ Tests pass (267 examples, 0 failures, added 4 comprehensive filtering tests)
 
 ---
 
