@@ -45,4 +45,4 @@ k8s/secrets-local.yaml
 tilt_modules/
 
 vocab/*
-.claude/settings.local.yaml
+/.claude/settings.local.json
