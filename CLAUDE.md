@@ -202,9 +202,16 @@ script/test.sh --format documentation --color
 ### Database Schema
 - **users**: Devise authentication (email, password, superuser)
 - **decks**: Named collections belonging to users (name, description, user_id)
-- **words**: Hebrew vocabulary items (representation, part_of_speech, mnemonic, pronunciation_url, picture_url)
+- **words**: Hebrew vocabulary items with lexeme/form relationships
+  - Core fields: representation, part_of_speech_category_id, mnemonic, pronunciation_url, picture_url
+  - Lexeme system: lexeme_id (self-referential for word forms)
+  - JSONB metadata: form_metadata (binyan, conjugation, number, status, etc.) with GIN index
+  - Legacy fields: gender_id, verb_form_id (may be deprecated)
 - **deck_words**: Join table for many-to-many relationship (deck_id, word_id) with unique constraint
 - **glosses**: Translation definitions (text, word_id)
+- **part_of_speech_categories**: Standardized POS types (Verb, Noun, Adjective, etc.)
+- **genders**: Gender categories (Masculine, Feminine, Common)
+- **verb_forms**: Verb form types (may be deprecated in favor of JSONB metadata)
 
 ### Database Configuration
 - **Development**: `learning_hebrew_development` - for local development work
@@ -218,14 +225,22 @@ script/test.sh --format documentation --color
 User (1) → Decks (many)
 Words (many) ↔ Decks (many) [via DeckWord join table]
 Words (1) → Glosses (many)
+Word (lexeme) → Words (forms) [self-referential via lexeme_id]
+Word → PartOfSpeechCategory
 ```
 
 **Key Features:**
+- **Lexeme/Form System**: Words can link to parent lexemes via `lexeme_id` (e.g., plural → singular, conjugations → infinitive)
+- **Dictionary Entry Logic**: `is_dictionary_entry?` method determines which words appear in dictionary listings based on POS-specific rules
+- **JSONB Metadata**: Flexible `form_metadata` column stores grammatical information (binyan, conjugation, number, status, etc.)
+- **GIN Index**: Fast JSONB queries for filtering by metadata fields
+- **Eager Loading**: Optimized queries prevent N+1 issues (includes :glosses, :decks, :part_of_speech_category)
+- **Hebrew Sorting**: Custom alphabetical sorting by Hebrew alphabet order with vowel marks
 - Many-to-many relationship between Decks and Words allows flexible vocabulary organization
 - Superuser functionality with environment-aware database seeds
 - Authorization with Pundit for role-based access control
 - Modern UI with Tailwind CSS and responsive navigation
-- Comprehensive test coverage with proper fixture management (197 examples, 0 failures)
+- Comprehensive test coverage with proper fixture management (301 examples, 0 failures)
 
 ### Key Technologies
 - **Rails 8.0** with modern defaults
@@ -247,6 +262,50 @@ Words (1) → Glosses (many)
 - `db/migrate/`: Database migration files
 - `config/routes.rb`: Defines RESTful routes for all resources
 - `spec/`: RSpec test suite with comprehensive coverage
+- `projects/lexeme_project.md`: Detailed design doc for lexeme/form system implementation
+
+### Lexeme/Form System
+
+The application implements a sophisticated lexeme/form system for Hebrew words:
+
+**Core Concepts:**
+- **Lexeme**: The dictionary entry form of a word (e.g., 3MS verb, singular noun)
+- **Form**: A grammatical variation of a lexeme (e.g., plural, different conjugation)
+- **Self-Referential Association**: Forms link to their parent lexeme via `lexeme_id`
+
+**Dictionary Entry Rules** (POS-specific):
+- **Verbs**: Only 3MS (3rd person masculine singular) are dictionary entries
+- **Nouns**: Only singular forms in absolute state (not construct)
+- **Adjectives**: Only masculine singular forms
+- **Participles**: Only masculine singular active forms
+- **Pronouns/Prepositions/etc.**: All are dictionary entries (each is distinct)
+
+**JSONB Metadata Fields** (`form_metadata` column):
+- **Verb fields**: root, binyan, aspect, conjugation, person, weakness
+- **Noun/Adjective fields**: number, status, gender, specific_type
+- **Import fields**: pos_type, lesson_introduced, function
+- **General fields**: notes, transliteration, variant_type
+
+**Key Methods:**
+- `is_dictionary_entry?`: Determines if word should appear in dictionary
+- `parent_word`: Returns lexeme if form, otherwise self
+- `form_description`: Describes grammatical features
+- `hebrew_sort_key`: Custom Hebrew alphabetical sorting
+
+**Search & Filtering**:
+- Filter by text search (representation or glosses)
+- Filter by POS, binyan, number
+- Filter by lesson (exact or cumulative "or less" mode)
+- Toggle to show all words vs. dictionary entries only
+
+**Import System**:
+- Supports both text format and JSON format
+- JSON format includes metadata and lexeme linking via `lexeme_of_hint`
+- Automatically merges POS details into JSONB `form_metadata`
+
+**Performance Optimizations**:
+- GIN index on `form_metadata` for fast JSONB queries
+- Eager loading prevents N+1 queries (`:glosses`, `:decks`, `:part_of_speech_category`)
 
 ## Development Environment
 
