@@ -4,7 +4,7 @@ class WordsController < ApplicationController
   # GET /words or /words.json
   def index
     authorize Word
-    @words = Word.all
+    @words = Word.includes(:decks, :glosses).all
   end
 
   # GET /words/1 or /words/1.json
@@ -80,7 +80,7 @@ class WordsController < ApplicationController
   private
     # Use callbacks to share common setup or constraints between actions.
     def set_word
-      @word = Word.find(params.expect(:id))
+      @word = Word.includes(:glosses, :decks).find(params.expect(:id))
     end
 
     # Load data needed for the form
