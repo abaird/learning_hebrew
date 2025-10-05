@@ -1008,25 +1008,25 @@ end
 
 ---
 
-### Phase 6: Word Show Page Enhancements
+### Phase 6: Word Show Page Enhancements ✅
 **Goal:** Display linked words on word detail pages
 
-- [ ] **6.1** Update `WordsController#show` to load linked words via `@word.forms`
-- [ ] **6.2** Add redirect logic: if word has `lexeme_id`, redirect to parent with anchor
-- [ ] **6.3** Update `app/views/words/show.html.erb` to display linked words
-- [ ] **6.4** Group linked words by type (conjugations, plurals, etc.) using metadata
-- [ ] **6.5** Add anchors for each linked word (for redirects)
-- [ ] **6.6** Order linked words logically (by grammatical features)
-- [ ] **6.7** Test show page with standalone words (no linked words)
-- [ ] **6.8** Test show page with linked words
-- [ ] **6.9** Test redirect from linked word to parent
-- [ ] **6.10** Write/update request specs
-- [ ] **6.11** Run tests: `bundle exec rspec spec/requests/words_spec.rb`
+- [x] **6.1** Update `WordsController#show` to load linked words via `@word.forms`
+- [x] **6.2** Add redirect logic: if word has `lexeme_id`, redirect to parent with anchor
+- [x] **6.3** Update `app/views/words/show.html.erb` to display linked words
+- [x] **6.4** Group linked words by type (conjugations, plurals, etc.) using metadata
+- [x] **6.5** Add anchors for each linked word (for redirects)
+- [x] **6.6** Order linked words logically (by grammatical features)
+- [x] **6.7** Test show page with standalone words (no linked words)
+- [x] **6.8** Test show page with linked words
+- [x] **6.9** Test redirect from linked word to parent
+- [x] **6.10** Write/update request specs
+- [x] **6.11** Run tests: `bundle exec rspec spec/requests/words_spec.rb`
 
 **Acceptance Criteria:**
-- Word show page displays all linked words in organized sections
-- Visiting `/words/:id` where word has `lexeme_id` redirects to parent
-- Tests pass
+- ✅ Word show page displays all linked words in organized sections
+- ✅ Visiting `/words/:id` where word has `lexeme_id` redirects to parent
+- ✅ Tests pass (273 examples, 0 failures)
 
 ---
 

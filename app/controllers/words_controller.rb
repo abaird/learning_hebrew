@@ -10,6 +10,15 @@ class WordsController < ApplicationController
   # GET /words/1 or /words/1.json
   def show
     authorize @word
+
+    # If this is a form (has lexeme_id), redirect to its parent word with anchor
+    if @word.lexeme_id.present?
+      redirect_to word_path(@word.lexeme, anchor: "form-#{@word.id}"), status: :moved_permanently
+      return
+    end
+
+    # Load all forms linked to this word, grouped by type
+    @forms = @word.forms.includes(:glosses).to_a
   end
 
   # GET /words/new

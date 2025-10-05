@@ -9,6 +9,93 @@
 
   <%= render @word %>
 
+  <% if @word.glosses.any? %>
+    <div class="my-5">
+      <strong class="block font-medium mb-1">Definitions:</strong>
+      <p><%= @word.formatted_glosses %></p>
+    </div>
+  <% end %>
+
+  <% if @forms&.any? %>
+    <div class="mt-8 border-t pt-6">
+      <h2 class="font-bold text-2xl mb-4">Related Forms</h2>
+
+      <% # Group forms by type based on metadata %>
+      <% verb_forms = @forms.select { |f| f.form_metadata['conjugation'].present? } %>
+      <% plural_forms = @forms.select { |f| f.form_metadata['number'] == 'plural' && f.form_metadata['conjugation'].blank? } %>
+      <% construct_forms = @forms.select { |f| f.form_metadata['status'] == 'construct' && !plural_forms.include?(f) } %>
+      <% other_forms = @forms - verb_forms - plural_forms - construct_forms %>
+
+      <% if verb_forms.any? %>
+        <div class="mb-6">
+          <h3 class="font-semibold text-lg mb-2">Verb Conjugations</h3>
+          <div class="space-y-2">
+            <% verb_forms.sort_by { |f| [ f.form_metadata['binyan'] || '', f.form_metadata['aspect'] || '', f.form_metadata['conjugation'] || '' ] }.each do |form| %>
+              <div id="form-<%= form.id %>" class="p-3 bg-gray-50 rounded">
+                <span class="text-2xl font-hebrew"><%= form.representation %></span>
+                <span class="text-sm text-gray-600 ml-2">(<%= form.form_description %>)</span>
+                <% if form.glosses.any? %>
+                  <div class="text-sm text-gray-700 mt-1"><%= form.formatted_glosses %></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if plural_forms.any? %>
+        <div class="mb-6">
+          <h3 class="font-semibold text-lg mb-2">Plural Forms</h3>
+          <div class="space-y-2">
+            <% plural_forms.each do |form| %>
+              <div id="form-<%= form.id %>" class="p-3 bg-gray-50 rounded">
+                <span class="text-2xl font-hebrew"><%= form.representation %></span>
+                <span class="text-sm text-gray-600 ml-2">(<%= form.form_description %>)</span>
+                <% if form.glosses.any? %>
+                  <div class="text-sm text-gray-700 mt-1"><%= form.formatted_glosses %></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if construct_forms.any? %>
+        <div class="mb-6">
+          <h3 class="font-semibold text-lg mb-2">Construct State Forms</h3>
+          <div class="space-y-2">
+            <% construct_forms.each do |form| %>
+              <div id="form-<%= form.id %>" class="p-3 bg-gray-50 rounded">
+                <span class="text-2xl font-hebrew"><%= form.representation %></span>
+                <span class="text-sm text-gray-600 ml-2">(<%= form.form_description %>)</span>
+                <% if form.glosses.any? %>
+                  <div class="text-sm text-gray-700 mt-1"><%= form.formatted_glosses %></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+
+      <% if other_forms.any? %>
+        <div class="mb-6">
+          <h3 class="font-semibold text-lg mb-2">Other Forms</h3>
+          <div class="space-y-2">
+            <% other_forms.each do |form| %>
+              <div id="form-<%= form.id %>" class="p-3 bg-gray-50 rounded">
+                <span class="text-2xl font-hebrew"><%= form.representation %></span>
+                <span class="text-sm text-gray-600 ml-2">(<%= form.form_description %>)</span>
+                <% if form.glosses.any? %>
+                  <div class="text-sm text-gray-700 mt-1"><%= form.formatted_glosses %></div>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
   <%= link_to "Edit this word", edit_word_path(@word), class: "w-full sm:w-auto text-center rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
   <%= link_to "Back to words", words_path, class: "w-full sm:w-auto text-center mt-2 sm:mt-0 sm:ml-2 rounded-md px-3.5 py-2.5 bg-gray-100 hover:bg-gray-50 inline-block font-medium" %>
   <div class="sm:inline-block mt-2 sm:mt-0 sm:ml-2">

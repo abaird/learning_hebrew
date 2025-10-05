@@ -200,5 +200,143 @@ RSpec.describe "/words", type: :request do
         expect(response).to redirect_to(words_url)
       end
     end
+
+    describe "GET /show with forms and lexeme relationships" do
+      let(:verb_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Verb') { |pos| pos.abbrev = 'v' } }
+      let(:noun_pos) { PartOfSpeechCategory.find_or_create_by!(name: 'Noun') { |pos| pos.abbrev = 'n' } }
+
+      it "displays linked forms on the parent word's page" do
+        # Create a parent word (dictionary entry)
+        parent = Word.create!(
+          representation: 'לָמַד',
+          part_of_speech_category: verb_pos,
+          form_metadata: { conjugation: '3MS' }
+        )
+        parent.glosses.create!(text: 'he learned')
+
+        # Create a form linked to the parent
+        form = Word.create!(
+          representation: 'לָמַדְתִּי',
+          part_of_speech_category: verb_pos,
+          lexeme_id: parent.id,
+          form_metadata: { binyan: 'qal', aspect: 'perfective', conjugation: '1CS' }
+        )
+        form.glosses.create!(text: 'I learned')
+
+        get word_url(parent)
+
+        expect(response).to be_successful
+        expect(response.body).to include('לָמַד')
+        expect(response.body).to include('he learned')
+        expect(response.body).to include('Related Forms')
+        expect(response.body).to include('לָמַדְתִּי')
+        expect(response.body).to include('qal perfective 1CS')
+        expect(response.body).to include('I learned')
+      end
+
+      it "redirects from form to parent word with anchor" do
+        # Create a parent word
+        parent = Word.create!(
+          representation: 'בֵּן',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'singular' }
+        )
+
+        # Create a form linked to the parent
+        form = Word.create!(
+          representation: 'בָּנִים',
+          part_of_speech_category: noun_pos,
+          lexeme_id: parent.id,
+          form_metadata: { number: 'plural' }
+        )
+
+        get word_url(form)
+
+        expect(response).to have_http_status(:moved_permanently)
+        expect(response).to redirect_to(word_url(parent, anchor: "form-#{form.id}"))
+      end
+
+      it "does not show forms section for standalone words without forms" do
+        word = Word.create!(
+          representation: 'שָׁלוֹם',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'singular' }
+        )
+
+        get word_url(word)
+
+        expect(response).to be_successful
+        expect(response.body).to include('שָׁלוֹם')
+        expect(response.body).not_to include('Related Forms')
+      end
+
+      it "groups verb forms separately from plural forms" do
+        # Create a parent verb
+        parent = Word.create!(
+          representation: 'לָמַד',
+          part_of_speech_category: verb_pos,
+          form_metadata: { conjugation: '3MS' }
+        )
+
+        # Create verb conjugation
+        verb_form = Word.create!(
+          representation: 'לָמַדְתִּי',
+          part_of_speech_category: verb_pos,
+          lexeme_id: parent.id,
+          form_metadata: { binyan: 'qal', aspect: 'perfective', conjugation: '1CS' }
+        )
+
+        get word_url(parent)
+
+        expect(response).to be_successful
+        expect(response.body).to include('Verb Conjugations')
+        expect(response.body).to include('לָמַדְתִּי')
+        expect(response.body).not_to include('Plural Forms')
+      end
+
+      it "displays plural forms in separate section" do
+        # Create a parent noun
+        parent = Word.create!(
+          representation: 'בֵּן',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'singular' }
+        )
+
+        # Create plural form
+        plural_form = Word.create!(
+          representation: 'בָּנִים',
+          part_of_speech_category: noun_pos,
+          lexeme_id: parent.id,
+          form_metadata: { number: 'plural' }
+        )
+
+        get word_url(parent)
+
+        expect(response).to be_successful
+        expect(response.body).to include('Plural Forms')
+        expect(response.body).to include('בָּנִים')
+        expect(response.body).not_to include('Verb Conjugations')
+      end
+
+      it "includes anchor IDs for each form" do
+        parent = Word.create!(
+          representation: 'בֵּן',
+          part_of_speech_category: noun_pos,
+          form_metadata: { number: 'singular' }
+        )
+
+        form = Word.create!(
+          representation: 'בָּנִים',
+          part_of_speech_category: noun_pos,
+          lexeme_id: parent.id,
+          form_metadata: { number: 'plural' }
+        )
+
+        get word_url(parent)
+
+        expect(response).to be_successful
+        expect(response.body).to include("id=\"form-#{form.id}\"")
+      end
+    end
   end
 end
