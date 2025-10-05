@@ -8,8 +8,6 @@ class Word < ApplicationRecord
   has_many :glosses, dependent: :destroy
 
   belongs_to :part_of_speech_category, optional: true
-  belongs_to :gender, optional: true
-  belongs_to :verb_form, optional: true
 
   # JSONB store accessors for form_metadata
   store_accessor :form_metadata,
@@ -103,13 +101,22 @@ class Word < ApplicationRecord
     glosses.map.with_index { |gloss, i| "#{i + 1}) #{gloss.text}" }.join(", ")
   end
 
-  # Returns formatted part of speech: "n.masc", "v.inf", etc.
+  # Returns formatted part of speech: "n.masc", "v.qal", etc.
   def formatted_pos
     return "" unless part_of_speech_category.present?
 
     parts = [ part_of_speech_category.abbrev ]
-    parts << gender.abbrev if gender.present?
-    parts << verb_form.abbrev if verb_form.present?
+
+    # Add gender from metadata if present
+    if form_metadata["gender"].present?
+      parts << form_metadata["gender"][0..3] # First 4 chars: "masc", "fem", "comm"
+    end
+
+    # Add binyan for verbs if present
+    if form_metadata["binyan"].present?
+      parts << form_metadata["binyan"]
+    end
+
     parts.join(".")
   end
 

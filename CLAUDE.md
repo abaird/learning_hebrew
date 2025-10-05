@@ -205,13 +205,12 @@ script/test.sh --format documentation --color
 - **words**: Hebrew vocabulary items with lexeme/form relationships
   - Core fields: representation, part_of_speech_category_id, mnemonic, pronunciation_url, picture_url
   - Lexeme system: lexeme_id (self-referential for word forms)
-  - JSONB metadata: form_metadata (binyan, conjugation, number, status, etc.) with GIN index
-  - Legacy fields: gender_id, verb_form_id (may be deprecated)
+  - JSONB metadata: form_metadata (binyan, conjugation, number, status, gender, etc.) with GIN index
 - **deck_words**: Join table for many-to-many relationship (deck_id, word_id) with unique constraint
 - **glosses**: Translation definitions (text, word_id)
 - **part_of_speech_categories**: Standardized POS types (Verb, Noun, Adjective, etc.)
-- **genders**: Gender categories (Masculine, Feminine, Common)
-- **verb_forms**: Verb form types (may be deprecated in favor of JSONB metadata)
+- **genders**: Gender categories (legacy table, no longer used - gender stored in JSONB metadata)
+- **verb_forms**: Verb form types (legacy table, no longer used - binyan stored in JSONB metadata)
 
 ### Database Configuration
 - **Development**: `learning_hebrew_development` - for local development work

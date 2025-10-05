@@ -24,20 +24,6 @@
   </div>
 
   <div class="my-5">
-    <%= form.label :gender_id, "Gender" %>
-    <%= form.collection_select :gender_id, @genders, :id, :name,
-      { include_blank: "(not set)", selected: word.gender_id },
-      { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
-  </div>
-
-  <div class="my-5">
-    <%= form.label :verb_form_id, "Verb Form" %>
-    <%= form.collection_select :verb_form_id, @verb_forms, :id, :name,
-      { include_blank: "(not set)", selected: word.verb_form_id },
-      { class: "block shadow-sm rounded-md border border-gray-400 focus:outline-blue-600 px-3 py-2 mt-2 w-full" } %>
-  </div>
-
-  <div class="my-5">
     <%= form.label :lexeme_id, "Parent Word (Lexeme)" %>
     <%= form.collection_select :lexeme_id, Word.where(lexeme_id: nil).order(:representation), :id, :representation,
       { include_blank: "(standalone word)", selected: word.lexeme_id },

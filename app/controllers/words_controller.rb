@@ -87,8 +87,6 @@ class WordsController < ApplicationController
     def load_form_data
       @decks = current_user.superuser? ? Deck.all : current_user.decks
       @pos_categories = PartOfSpeechCategory.all.order(:name)
-      @genders = Gender.all.order(:name)
-      @verb_forms = VerbForm.all.order(:name)
     end
 
     # Only allow a list of trusted parameters through.
@@ -96,8 +94,6 @@ class WordsController < ApplicationController
       params.expect(word: [
         :representation,
         :part_of_speech_category_id,
-        :gender_id,
-        :verb_form_id,
         :mnemonic,
         :pronunciation_url,
         :picture_url,

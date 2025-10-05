@@ -7,8 +7,6 @@ RSpec.describe "words/edit", type: :view do
   before(:each) do
     assign(:word, word)
     assign(:pos_categories, PartOfSpeechCategory.all)
-    assign(:genders, Gender.all)
-    assign(:verb_forms, VerbForm.all)
     assign(:decks, [])
   end
 
@@ -19,8 +17,6 @@ RSpec.describe "words/edit", type: :view do
       assert_select "input[name=?]", "word[representation]"
 
       assert_select "select[name=?]", "word[part_of_speech_category_id]"
-      assert_select "select[name=?]", "word[gender_id]"
-      assert_select "select[name=?]", "word[verb_form_id]"
 
       assert_select "textarea[name=?]", "word[mnemonic]"
 
