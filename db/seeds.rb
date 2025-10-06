@@ -19,16 +19,20 @@ puts "Superuser created: #{superuser.email}"
 # Create part of speech categories
 pos_categories = [
   { name: "Noun", abbrev: "n" },
+  { name: "Noun Phrase", abbrev: "phrase" },
   { name: "Proper Noun", abbrev: "pr. n" },
   { name: "Verb", abbrev: "v" },
   { name: "Adjective", abbrev: "adj" },
-  { name: "Adverb", abbrev: "adv" },
+  { name: "Adverb/Participle", abbrev: "adv" },
   { name: "Pronoun", abbrev: "pron" },
+  { name: "Interrogative Pronoun", abbrev: "int. pron" },
   { name: "Preposition", abbrev: "prep" },
   { name: "Conjunction", abbrev: "conj" },
   { name: "Particle", abbrev: "part" },
   { name: "Interjection", abbrev: "interj" },
   { name: "Numeral", abbrev: "num" },
+  { name: "Consonant", abbrev: "cons" },
+  { name: "Possessive Suffix", abbrev: "poss. suf" },
   { name: "Unknown", abbrev: "?" }
 ]
 
