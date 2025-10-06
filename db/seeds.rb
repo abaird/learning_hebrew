@@ -33,6 +33,7 @@ pos_categories = [
   { name: "Numeral", abbrev: "num" },
   { name: "Consonant", abbrev: "cons" },
   { name: "Possessive Suffix", abbrev: "poss. suf" },
+  { name: "Quantifier", abbrev: "quant" },
   { name: "Unknown", abbrev: "?" }
 ]
 

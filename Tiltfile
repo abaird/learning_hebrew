@@ -18,25 +18,23 @@ docker_build(
 
     # Live update configuration for fast Ruby development
     live_update=[
-        # Fall back to full rebuild for critical config changes
-        fall_back_on(['./Gemfile', './Gemfile.lock', './config/routes.rb']),
+        # Fall back to full rebuild only for dependency changes
+        fall_back_on(['./Gemfile', './Gemfile.lock', './package.json', './package-lock.json']),
 
-        # Sync Ruby application code (skip rebuilds for code changes)
+        # Sync Ruby application code
         sync('./app', '/rails/app'),
         sync('./lib', '/rails/lib'),
         sync('./spec', '/rails/spec'),
-
-        # Sync view templates and assets
-        sync('./app/views', '/rails/app/views'),
-        sync('./app/assets', '/rails/app/assets'),
+        sync('./config', '/rails/config'),
+        sync('./db', '/rails/db'),
 
         # Run commands inside container for certain changes
         run('bundle install', trigger=['./Gemfile', './Gemfile.lock']),
-        run('SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile', trigger=['./app/assets/', './config/application.rb']),
+        run('SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile', trigger=['./app/assets/']),
     ],
 
     # Only rebuild image when Dockerfile or key dependencies change
-    ignore=['.git', 'tmp/', 'log/', 'storage/', '.port-forward.pid', 'projects/']
+    ignore=['.git', 'tmp/', 'log/', 'storage/', '.port-forward.pid', 'projects/', 'vocab/']
 )
 
 # Apply Kubernetes manifests (use local configurations for minikube)
