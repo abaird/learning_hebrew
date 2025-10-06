@@ -54,23 +54,27 @@ spec:
               key: postgres-password
         resources:
           requests:
-            memory: "128Mi"
-            cpu: "50m"
-          limits:
             memory: "256Mi"
-            cpu: "200m"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "500m"
         livenessProbe:
           httpGet:
             path: /up
             port: 3000
           initialDelaySeconds: 30
           periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
         readinessProbe:
           httpGet:
             path: /up
             port: 3000
-          initialDelaySeconds: 5
+          initialDelaySeconds: 10
           periodSeconds: 5
+          timeoutSeconds: 5
+          failureThreshold: 3
 ---
 apiVersion: v1
 kind: Service
