@@ -19,6 +19,15 @@ class WordsController < ApplicationController
 
     # Load all forms linked to this word, grouped by type
     @forms = @word.forms.includes(:glosses).to_a
+
+    # Build back URL based on return_to parameter
+    @back_url = if params[:return_to] == "dictionary" && session[:dictionary_filters].present?
+      dictionary_path(session[:dictionary_filters])
+    elsif params[:return_to] == "dictionary"
+      dictionary_path
+    else
+      words_path
+    end
   end
 
   # GET /words/new
@@ -32,6 +41,15 @@ class WordsController < ApplicationController
   def edit
     load_form_data
     authorize @word
+
+    # Build back URL based on return_to parameter
+    @back_url = if params[:return_to] == "dictionary" && session[:dictionary_filters].present?
+      dictionary_path(session[:dictionary_filters])
+    elsif params[:return_to] == "dictionary"
+      dictionary_path
+    else
+      word_path(@word)
+    end
   end
 
   # POST /words or /words.json
@@ -56,10 +74,26 @@ class WordsController < ApplicationController
     authorize @word
     respond_to do |format|
       if @word.update(word_params)
-        format.html { redirect_to @word, notice: "Word was successfully updated." }
+        # Redirect back to dictionary with filters if that's where we came from
+        redirect_url = if params[:return_to] == "dictionary" && session[:dictionary_filters].present?
+          dictionary_path(session[:dictionary_filters])
+        elsif params[:return_to] == "dictionary"
+          dictionary_path
+        else
+          @word
+        end
+
+        format.html { redirect_to redirect_url, notice: "Word was successfully updated." }
         format.json { render :show, status: :ok, location: @word }
       else
         load_form_data
+        @back_url = if params[:return_to] == "dictionary" && session[:dictionary_filters].present?
+          dictionary_path(session[:dictionary_filters])
+        elsif params[:return_to] == "dictionary"
+          dictionary_path
+        else
+          word_path(@word)
+        end
         format.html { render :edit, status: :unprocessable_content }
         format.json { render json: @word.errors, status: :unprocessable_content }
       end

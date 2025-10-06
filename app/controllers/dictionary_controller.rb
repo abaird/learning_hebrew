@@ -1,5 +1,9 @@
 class DictionaryController < ApplicationController
   def index
+    # Store search params in session for later use
+    filter_params = params.permit(:q, :pos_id, :binyan, :number, :lesson, :lesson_mode, :show_all).to_h
+    session[:dictionary_filters] = filter_params if filter_params.present?
+
     # Start with base query
     words = Word.includes(:glosses, :part_of_speech_category)
 

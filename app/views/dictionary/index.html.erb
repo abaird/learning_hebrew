@@ -54,7 +54,7 @@
     <% @words.each do |word| %>
       <div class="pb-4">
         <div class="flex items-baseline flex-wrap" style="gap: 0.5rem">
-          <%= link_to word_path(word), class: "text-3xl font-hebrew hover:text-blue-600" do %>
+          <%= link_to word_path(word, return_to: 'dictionary'), class: "text-3xl font-hebrew hover:text-blue-600" do %>
             <%= word.representation %>
           <% end %>
           <% if word.pos_display.present? %>

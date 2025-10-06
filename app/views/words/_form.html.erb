@@ -1,4 +1,6 @@
 <%= form_with(model: word, class: "contents") do |form| %>
+  <%= hidden_field_tag :return_to, params[:return_to] if params[:return_to].present? %>
+
   <% if word.errors.any? %>
     <div id="error_explanation" class="bg-red-50 text-red-500 px-3 py-2 font-medium rounded-md mt-3">
       <h2><%= pluralize(word.errors.count, "error") %> prohibited this word from being saved:</h2>
