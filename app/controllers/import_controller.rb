@@ -18,9 +18,13 @@ class ImportController < ApplicationController
 
     begin
       parsed_data = parser.parse
-      import_words(parsed_data)
+      result = import_words(parsed_data)
 
-      redirect_to root_path, notice: "Successfully imported #{parsed_data.length} words with their glosses"
+      if result[:errors] > 0
+        redirect_to root_path, notice: "Import completed: #{result[:success]} words imported, #{result[:errors]} errors (check logs for details)"
+      else
+        redirect_to root_path, notice: "Successfully imported #{result[:success]} words with their glosses"
+      end
     rescue DictionaryImportParser::ParseError => e
       render :new, status: :unprocessable_entity, locals: { error: e.message }
     end
@@ -30,24 +34,36 @@ class ImportController < ApplicationController
 
   def import_words(parsed_data)
     unknown_pos = PartOfSpeechCategory.find_by(abbrev: "?")
+    success_count = 0
+    error_count = 0
 
-    ActiveRecord::Base.transaction do
-      parsed_data.each do |entry|
-        # Check if this is JSON format (has pos field) or text format
-        if entry[:pos].present?
-          import_json_word(entry)
-        else
-          import_text_word(entry, unknown_pos)
+    parsed_data.each do |entry|
+      begin
+        ActiveRecord::Base.transaction do
+          # Check if this is JSON format (has pos field) or text format
+          if entry[:pos].present?
+            import_json_word(entry, unknown_pos)
+          else
+            import_text_word(entry, unknown_pos)
+          end
+          success_count += 1
         end
+      rescue => e
+        error_count += 1
+        Rails.logger.error "Failed to import word '#{entry[:representation]}': #{e.message}"
+        Rails.logger.error e.backtrace.join("\n")
       end
     end
+
+    { success: success_count, errors: error_count }
   end
 
-  def import_json_word(entry)
+  def import_json_word(entry, unknown_pos)
     # Find part of speech category by name
     pos_category = PartOfSpeechCategory.find_by(name: entry[:pos])
     if pos_category.nil?
-      raise DictionaryImportParser::ParseError, "Part of speech '#{entry[:pos]}' not found"
+      Rails.logger.warn "Part of speech '#{entry[:pos]}' not found for word '#{entry[:representation]}', using 'Unknown'"
+      pos_category = unknown_pos
     end
 
     # Try to find parent lexeme if hint provided

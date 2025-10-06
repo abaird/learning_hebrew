@@ -314,7 +314,7 @@ RSpec.describe "Imports", type: :request do
           expect(word.lexeme_id).to be_nil  # Parent not found, lexeme_id stays null
         end
 
-        it "raises error if POS category doesn't exist" do
+        it "uses Unknown POS if category doesn't exist" do
           json_content = <<~JSON
             [
               {
@@ -334,10 +334,11 @@ RSpec.describe "Imports", type: :request do
 
           expect {
             post import_path, params: { file: file }
-          }.not_to change(Word, :count)
+          }.to change(Word, :count).by(1)
 
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(response.body).to include('NonexistentPOS')
+          word = Word.find_by(representation: 'test')
+          expect(word.part_of_speech_category&.abbrev).to eq('?')
+          expect(response).to redirect_to(root_path)
         end
       end
     end
