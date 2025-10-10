@@ -3,11 +3,13 @@
     <h1 class="font-bold text-4xl">Hebrew Dictionary</h1>
   </div>
 
+  <%= render "shared/hebrew_keyboard" %>
+
   <%= form_with url: dictionary_path, method: :get, class: "mb-6 space-y-4" do |form| %>
     <div class="flex gap-4 items-end flex-wrap">
       <div class="flex-1 min-w-[200px]">
         <%= form.label :q, "Search", class: "block text-sm font-medium text-gray-700 mb-1" %>
-        <%= form.text_field :q, value: params[:q], placeholder: "Search words or definitions...", class: "block w-full rounded-md border border-gray-400 px-3 py-2" %>
+        <%= form.text_field :q, value: params[:q], placeholder: "Search words or definitions...", id: "q", class: "block w-full rounded-md border border-gray-400 px-3 py-2" %>
       </div>
 
       <div class="w-48">
@@ -45,7 +47,7 @@
     </div>
 
     <div class="flex items-center">
-      <%= form.check_box :show_all, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" }, "true", nil %>
+      <%= form.check_box :show_all, { class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded", checked: @show_all }, "true", "false" %>
       <%= form.label :show_all, "Show all words (including non-dictionary forms)", class: "ml-2 text-sm text-gray-700" %>
     </div>
   <% end %>

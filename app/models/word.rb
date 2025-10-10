@@ -68,6 +68,11 @@ class Word < ApplicationRecord
     "\u05BC" => 10  # Dagesh
   }
 
+  # Regex to match Hebrew diacriticals (vowels and cantillation marks)
+  # Includes: vowel points (U+05B0-05BD, U+05BF-05C2, U+05C4-05C5, U+05C7)
+  # and cantillation marks (U+0591-05AF)
+  HEBREW_DIACRITICALS = /[\u0591-\u05AF\u05B0-\u05BD\u05BF-\u05C2\u05C4-\u05C5\u05C7]/
+
   scope :alphabetically, -> {
     all.sort_by { |word| hebrew_sort_key(word.representation) }
   }
@@ -96,6 +101,16 @@ class Word < ApplicationRecord
     result.empty? ? [ [ Float::INFINITY, 0 ] ] : result
   end
 
+  # Normalize Hebrew text for search by removing vowels and cantillation marks
+  # and converting final forms to regular forms
+  # This allows searching for אֶרֶץ to match אֶ֫רֶץ (with accent mark)
+  # and searching for נון to match final nun ן
+  def self.normalize_hebrew(text)
+    return "" if text.blank?
+    text.gsub(HEBREW_DIACRITICALS, "")
+        .tr("ךםןףץ", "כמנפצ")  # Convert final forms to regular forms
+  end
+
   # Returns formatted glosses as numbered list: "1) peace, 2) hello"
   def formatted_glosses
     glosses.map.with_index { |gloss, i| "#{i + 1}) #{gloss.text}" }.join(", ")
@@ -109,7 +124,7 @@ class Word < ApplicationRecord
 
     # Add gender from metadata if present
     if form_metadata["gender"].present?
-      parts << form_metadata["gender"][0..3] # First 4 chars: "masc", "fem", "comm"
+      parts << form_metadata["gender"][0..2] # First 3 chars: "masc", "fem", "comm"
     end
 
     # Add binyan for verbs if present

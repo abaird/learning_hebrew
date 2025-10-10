@@ -1,8 +1,18 @@
 class DictionaryController < ApplicationController
   def index
-    # Store search params in session for later use
+    # Determine show_all value: use param, then session, then default to true
+    @show_all = if params.key?(:show_all)
+      params[:show_all] == "true"
+    elsif session[:dictionary_filters]&.key?("show_all")
+      session[:dictionary_filters]["show_all"] == "true"
+    else
+      true  # Default to showing all words
+    end
+
+    # Store search params in session for later use (include computed show_all)
     filter_params = params.permit(:q, :pos_id, :binyan, :number, :lesson, :lesson_mode, :show_all).to_h
-    session[:dictionary_filters] = filter_params if filter_params.present?
+    filter_params["show_all"] = @show_all.to_s
+    session[:dictionary_filters] = filter_params
 
     # Start with base query
     words = Word.includes(:glosses, :part_of_speech_category)
@@ -10,9 +20,18 @@ class DictionaryController < ApplicationController
     # Apply search filter if present
     if params[:q].present?
       query = params[:q].strip
-      # Search in representation and glosses
+      normalized_query = Word.normalize_hebrew(query)
+
+      # Search in representation (normalized) and glosses
+      # Normalize by: 1) removing diacriticals, 2) converting final forms to regular
+      normalized_representation = "translate(regexp_replace(words.representation, '[\\u0591-\\u05AF\\u05B0-\\u05BD\\u05BF-\\u05C2\\u05C4-\\u05C5\\u05C7]', '', 'g'), 'ךםןףץ', 'כמנפצ')"
+
       words = words.left_joins(:glosses)
-                   .where("words.representation ILIKE ? OR glosses.text ILIKE ?", "%#{query}%", "%#{query}%")
+                   .where(
+                     "#{normalized_representation} ILIKE ? OR glosses.text ILIKE ?",
+                     "%#{normalized_query}%",
+                     "%#{query}%"
+                   )
                    .distinct
     end
 
@@ -46,7 +65,7 @@ class DictionaryController < ApplicationController
     all_words = words.alphabetically.to_a
 
     # Filter by dictionary entries unless show_all is true
-    unless params[:show_all] == "true"
+    unless @show_all
       all_words = all_words.select { |w| w.is_dictionary_entry? }
     end
 

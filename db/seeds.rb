@@ -19,7 +19,7 @@ puts "Superuser created: #{superuser.email}"
 # Create part of speech categories
 pos_categories = [
   { name: "Noun", abbrev: "n" },
-  { name: "Noun Phrase", abbrev: "phrase" },
+  { name: "Phrase", abbrev: "phrase" },
   { name: "Proper Noun", abbrev: "pr. n" },
   { name: "Verb", abbrev: "v" },
   { name: "Adjective", abbrev: "adj" },

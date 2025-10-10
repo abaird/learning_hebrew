@@ -1,0 +1,189 @@
+<div data-controller="hebrew-keyboard" class="mb-4">
+  <button
+    type="button"
+    data-action="click->hebrew-keyboard#toggle"
+    class="mb-2 text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-2"
+  >
+    <span data-hebrew-keyboard-target="toggleIcon">▼</span>
+    <span>Hebrew Keyboard (SIL Layout)</span>
+  </button>
+
+  <div data-hebrew-keyboard-target="keyboard" class="bg-gray-50 border border-gray-300 rounded-lg p-4 space-y-2">
+    <!-- Special buttons on the left -->
+    <div class="flex gap-2 mb-4">
+      <div class="flex gap-1">
+        <!-- Hataf column -->
+        <div class="flex flex-col gap-1">
+          <p class="text-xs text-gray-600 mb-1 text-center">Hataf</p>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B3;"
+                  title="Hataf Qamats"
+                  class="w-12 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+            <span class="absolute">◌</span>
+            <span class="absolute">&#x05B3;</span>
+          </button>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B1;"
+                  title="Hataf Segol"
+                  class="w-12 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+            <span class="absolute">◌</span>
+            <span class="absolute">&#x05B1;</span>
+          </button>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B2;"
+                  title="Hataf Patach"
+                  class="w-12 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+            <span class="absolute">◌</span>
+            <span class="absolute">&#x05B2;</span>
+          </button>
+        </div>
+        <!-- Special column -->
+        <div class="flex flex-col gap-1">
+          <p class="text-xs text-gray-600 mb-1 text-center">Special</p>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05BC;"
+                  title="Dagesh"
+                  class="w-12 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+            <span class="absolute">◌</span>
+            <span class="absolute">&#x05BC;</span>
+          </button>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05BE;"
+                  title="Maqaf"
+                  class="w-12 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">
+            ־
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 space-y-2">
+    <!-- Normal layout (unshifted) -->
+    <div data-shift="normal">
+      <!-- Row 1 -->
+      <div class="flex gap-1 justify-center mb-2">
+        <% %w[ק ו].each do |char| %>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="<%= char %>" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl"><%= char %></button>
+        <% end %>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B6;" title="Segol" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05B6;</span>
+        </button>
+        <% %w[ר ת י].each do |char| %>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="<%= char %>" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl"><%= char %></button>
+        <% end %>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05BB;" title="Qubuts" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05BB;</span>
+        </button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B4;" title="Hireq" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05B4;</span>
+        </button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B9;" title="Holam" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05B9;</span>
+        </button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="פ" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">פ</button>
+      </div>
+      <!-- Row 2 -->
+      <div class="flex gap-1 justify-center mb-2">
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B7;" title="Patach" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05B7;</span>
+        </button>
+        <% %w[ס ד שׂ ג ה שׁ כ ל].each do |char| %>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="<%= char %>" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl"><%= char %></button>
+        <% end %>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B0;" title="Sheva" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05B0;</span>
+        </button>
+      </div>
+      <!-- Row 3 -->
+      <div class="flex gap-1 justify-center">
+        <button type="button"
+                data-action="click->hebrew-keyboard#toggleShift"
+                data-shift-button
+                class="w-16 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 text-sm font-medium">
+          Shift
+        </button>
+        <% %w[ז ח צ ט ב נ מ ע א].each do |char| %>
+          <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="<%= char %>" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl"><%= char %></button>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Shifted layout -->
+    <div data-shift="shifted" class="hidden">
+      <!-- Row 1 shifted -->
+      <div class="flex gap-1 justify-center mb-2">
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x0597;" title="Revia" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x0597;</span>
+        </button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B5;" title="Tsere" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05B5;</span>
+        </button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x059F;" title="Qarnei Para" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x059F;</span>
+        </button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05BA;" title="Holam for Vav" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05BA;</span>
+        </button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="ף" title="Final Pe" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">ף</button>
+      </div>
+      <!-- Row 2 shifted -->
+      <div class="flex gap-1 justify-center mb-2">
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05B8;" title="Qamats" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl relative flex items-center justify-center">
+          <span class="absolute">◌</span>
+          <span class="absolute">&#x05B8;</span>
+        </button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="שׁ" title="Shin" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">שׁ</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="ך" title="Final Kaf" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">ך</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="&#x05F4;" title="Gershayim" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">״</button>
+      </div>
+      <!-- Row 3 shifted -->
+      <div class="flex gap-1 justify-center">
+        <button type="button"
+                data-action="click->hebrew-keyboard#toggleShift"
+                data-shift-button
+                class="w-16 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 text-sm font-medium">
+          Shift
+        </button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="ץ" title="Final Tsadi" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">ץ</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" class="w-10 h-10 bg-gray-100 border border-gray-300 rounded text-xs text-gray-400">—</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="ן" title="Final Nun" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">ן</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="ם" title="Final Mem" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">ם</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="ע" title="Ayin" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">ע</button>
+        <button type="button" data-action="click->hebrew-keyboard#insertChar" data-char="א" title="Alef" class="w-10 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 font-hebrew text-xl">א</button>
+      </div>
+    </div>
+
+      </div> <!-- End flex-1 -->
+    </div> <!-- End hataf container -->
+
+    <!-- Special controls -->
+    <div class="flex gap-2 justify-center pt-2 border-t border-gray-300">
+      <button type="button" data-action="click->hebrew-keyboard#insertSpace"
+              class="px-6 h-10 bg-white border border-gray-300 rounded hover:bg-blue-50 text-sm">
+        Space
+      </button>
+      <button type="button" data-action="click->hebrew-keyboard#backspace"
+              class="px-4 h-10 bg-white border border-gray-300 rounded hover:bg-red-50 text-sm">
+        ← Delete
+      </button>
+    </div>
+  </div>
+</div>
