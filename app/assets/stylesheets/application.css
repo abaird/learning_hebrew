@@ -20,3 +20,10 @@
 .font-hebrew {
   font-family: 'SBL Hebrew', serif;
 }
+
+.test-custom-bg {
+  background-color: #ff00ff;
+  padding: 20px;
+  border: 5px solid #00ff00;
+  font-size: 24px;
+}

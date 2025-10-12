@@ -30,7 +30,8 @@ docker_build(
 
         # Run commands inside container for certain changes
         run('bundle install', trigger=['./Gemfile', './Gemfile.lock']),
-        run('SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile', trigger=['./app/assets/']),
+        # Note: Asset precompile removed - Rails 8 Propshaft serves assets directly in development
+        # Just syncing the files is enough for live CSS updates
     ],
 
     # Only rebuild image when Dockerfile or key dependencies change

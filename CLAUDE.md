@@ -190,6 +190,9 @@ script/test.sh spec/requests/decks_spec.rb
 
 # Run tests with RSpec options
 script/test.sh --format documentation --color
+
+# Verify CSS deployment and styling
+script/test-css.sh
 ```
 
 ### Git Integration
@@ -323,6 +326,62 @@ The application supports multiple development approaches:
 - **Production**: Deployed on Google Kubernetes Engine (GKE) with CI/CD via GitHub Actions
 - **Local**: minikube for testing Kubernetes configurations locally before production deployment
 - **Testing**: Separate test database (`learning_hebrew_test`) with proper environment isolation
+
+### CSS & Asset Compilation
+
+The development environment uses a dual-process setup via Foreman to enable live CSS updates without Docker rebuilds.
+
+**Procfile.dev Configuration:**
+```
+web: bin/rails server -b 0.0.0.0 -p 3000
+css: ./bin/rails tailwindcss:build && while true; do sleep 5 && ./bin/rails tailwindcss:build 2>/dev/null; done
+```
+
+**How It Works:**
+- Foreman runs both Rails server and CSS builder simultaneously
+- CSS process rebuilds Tailwind every 5 seconds via polling loop
+- Tilt syncs file changes from local machine to container instantly
+- Propshaft serves updated CSS files from `app/assets/builds/tailwind.css`
+- Browser refresh loads new styles (no automatic reload)
+
+**Development Workflow for CSS Changes:**
+1. Edit `app/assets/stylesheets/application.css` or `app/assets/tailwind/application.css`
+2. Tilt syncs file to container (instant)
+3. CSS builder detects change and rebuilds (within 5 seconds)
+4. Hard refresh browser (Cmd+Shift+R / Ctrl+Shift+R)
+5. Changes appear - **no Docker rebuild needed!**
+
+**Asset Configuration:**
+- **Dockerfile.dev**: Does NOT precompile assets (allows live updates)
+- **Dockerfile (production)**: DOES precompile assets at build time (line 56)
+- **Layout**: Explicitly loads both Tailwind and application CSS files
+  ```erb
+  <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+  ```
+
+**Testing CSS Deployment:**
+```bash
+# Verify CSS is properly deployed and serving
+script/test-css.sh
+```
+
+The test script validates:
+- Homepage loads successfully
+- Stylesheet links present in HTML
+- CSS files serve valid content (not 404s)
+- Tailwind utility classes are defined in CSS
+- Tailwind file is substantial size (20KB+)
+- Custom font classes are defined
+- HTML classes have corresponding CSS definitions
+
+**Troubleshooting:**
+- If CSS doesn't update: Check container logs for build errors
+  ```bash
+  kubectl logs -f deployment/learning-hebrew-app -n learning-hebrew | grep css
+  ```
+- If builds take longer than 5 seconds: Check file permissions or disk I/O
+- For immediate rebuild: `kubectl exec deployment/learning-hebrew-app -n learning-hebrew -- bin/rails tailwindcss:build`
 
 ## Deployment Architecture
 
