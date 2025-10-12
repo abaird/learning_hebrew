@@ -10,7 +10,7 @@ class DictionaryController < ApplicationController
     end
 
     # Store search params in session for later use (include computed show_all)
-    filter_params = params.permit(:q, :pos_id, :binyan, :number, :lesson, :lesson_mode, :show_all).to_h
+    filter_params = params.permit(:q, :pos_id, :binyan, :number, :lesson, :lesson_mode, :show_all, :page, :commit).to_h
     filter_params["show_all"] = @show_all.to_s
     session[:dictionary_filters] = filter_params
 
@@ -61,13 +61,14 @@ class DictionaryController < ApplicationController
       end
     end
 
-    # Apply alphabetical sorting and convert to array
-    all_words = words.alphabetically.to_a
-
-    # Filter by dictionary entries unless show_all is true
+    # Filter by dictionary entries in SQL (unless show_all is true)
     unless @show_all
-      all_words = all_words.select { |w| w.is_dictionary_entry? }
+      words = words.where(is_dictionary_entry: true)
     end
+
+    # Apply alphabetical sorting and convert to array
+    # Note: alphabetically scope requires loading to memory for Hebrew sorting
+    all_words = words.alphabetically.to_a
 
     # Paginate results
     @words = Kaminari.paginate_array(all_words).page(params[:page]).per(25)

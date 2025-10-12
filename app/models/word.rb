@@ -50,6 +50,7 @@ class Word < ApplicationRecord
   validates :representation, presence: true
 
   before_save :update_pos_display
+  before_save :set_dictionary_entry_flag
 
   # Hebrew alphabet order for sorting (consonants)
   HEBREW_ALPHABET = %w[א ב ג ד ה ו ז ח ט י כ ך ל מ ם נ ן ס ע פ ף צ ץ ק ר ש ת]
@@ -77,9 +78,7 @@ class Word < ApplicationRecord
     all.sort_by { |word| hebrew_sort_key(word.representation) }
   }
   scope :word_forms, -> { where.not(lexeme_id: nil) }
-  scope :dictionary_entries, -> {
-    where(lexeme_id: nil).select { |w| w.is_dictionary_entry? }
-  }
+  scope :dictionary_entries, -> { where(is_dictionary_entry: true) }
 
   def self.hebrew_sort_key(hebrew_text)
     return [ Float::INFINITY ] if hebrew_text.blank?
@@ -223,5 +222,9 @@ class Word < ApplicationRecord
 
   def update_pos_display
     self.pos_display = formatted_pos
+  end
+
+  def set_dictionary_entry_flag
+    self.is_dictionary_entry = is_dictionary_entry?
   end
 end

@@ -208,6 +208,7 @@ script/test-css.sh
 - **words**: Hebrew vocabulary items with lexeme/form relationships
   - Core fields: representation, part_of_speech_category_id, mnemonic, pronunciation_url, picture_url
   - Lexeme system: lexeme_id (self-referential for word forms)
+  - Dictionary filtering: is_dictionary_entry (boolean with index for fast filtering)
   - JSONB metadata: form_metadata (binyan, conjugation, number, status, gender, etc.) with GIN index
 - **deck_words**: Join table for many-to-many relationship (deck_id, word_id) with unique constraint
 - **glosses**: Translation definitions (text, word_id)
@@ -311,8 +312,11 @@ The application implements a sophisticated lexeme/form system for Hebrew words:
 - Automatically merges POS details into JSONB `form_metadata`
 
 **Performance Optimizations**:
+- `is_dictionary_entry` boolean column with index for fast SQL filtering (replaces Ruby-level filtering)
+- Dictionary controller filters in SQL before loading to memory (major performance improvement)
 - GIN index on `form_metadata` for fast JSONB queries
 - Eager loading prevents N+1 queries (`:glosses`, `:decks`, `:part_of_speech_category`)
+- Automatic callback (`before_save :set_dictionary_entry_flag`) keeps column in sync with logic
 
 ## Development Environment
 
@@ -515,6 +519,28 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
 - Search normalization implemented at both model level (`Word.normalize_hebrew`) and controller level (dictionary search)
 - JSONB metadata supports new POS categories without schema changes
 - Session storage preserves user preferences across page loads
+
+### Dictionary Performance Optimization (Phase 8)
+- **Problem Identified**: Dictionary controller was loading ALL words into memory before filtering and paginating
+  - Caused slow performance, especially with Turbo prefetch triggering requests on hover
+  - Example: With 5,000 words, every page view loaded all 5,000 records before showing 25
+- **Solution Implemented**:
+  - Added `is_dictionary_entry` boolean column to `words` table with index (migration 20251012222353)
+  - Added `before_save :set_dictionary_entry_flag` callback to automatically maintain column
+  - Updated dictionary controller to filter in SQL (`WHERE is_dictionary_entry = true`) before loading to memory
+  - Updated `dictionary_entries` scope to use SQL instead of Ruby filtering
+  - Migration automatically backfilled all existing words with correct values
+- **Performance Impact**:
+  - Before: `words.to_a` → Ruby filter → paginate (loaded all records every time)
+  - After: SQL filter → `words.to_a` → paginate (only loads filtered subset)
+  - Significantly improved response time, especially with growing vocabulary
+- **Parameter Fixes**: Added `:page` and `:commit` to permitted parameters in dictionary controller
+- **Test Updates**: Updated dictionary specs to pass `show_all: 'false'` for filtering tests (default changed to show all)
+- **Files Changed**:
+  - `db/migrate/20251012222353_add_is_dictionary_entry_to_words.rb` - migration with backfill
+  - `app/models/word.rb` - added callback and updated scope (lines 53, 81, 229-231)
+  - `app/controllers/dictionary_controller.rb` - SQL filtering and parameter fixes (lines 13, 65-67)
+  - `spec/requests/dictionary_spec.rb` - updated tests for new default behavior
 
 ### UI/UX Improvements (Phase 6)
 - **Responsive Navigation**: Modern header with logo, active page highlighting, and user info display

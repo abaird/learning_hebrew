@@ -69,7 +69,7 @@ RSpec.describe "Dictionaries", type: :request do
         )
         verb_1cs.glosses.create!(text: 'I learned')
 
-        get root_path
+        get dictionary_path, params: { show_all: 'false' }
 
         expect(response.body).to include('לָמַד')
         expect(response.body).to include('he learned')
@@ -94,7 +94,7 @@ RSpec.describe "Dictionaries", type: :request do
         )
         plural_noun.glosses.create!(text: 'sons')
 
-        get root_path
+        get dictionary_path, params: { show_all: 'false' }
 
         expect(response.body).to include('בֵּן')
         expect(response.body).to include('son')
@@ -119,7 +119,7 @@ RSpec.describe "Dictionaries", type: :request do
         )
         construct_noun.glosses.create!(text: 'son of')
 
-        get root_path
+        get dictionary_path, params: { show_all: 'false' }
 
         expect(response.body).to include('בֵּן')
         expect(response.body).to include('son')
@@ -145,7 +145,7 @@ RSpec.describe "Dictionaries", type: :request do
         )
         form.glosses.create!(text: 'sons')
 
-        get root_path
+        get dictionary_path, params: { show_all: 'false' }
 
         expect(response.body).to include('בֵּן')
         expect(response.body).to include('son')
