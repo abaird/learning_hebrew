@@ -231,6 +231,8 @@ Word → PartOfSpeechCategory
 **Key Features:**
 - **Lexeme/Form System**: Words can link to parent lexemes via `lexeme_id` (e.g., plural → singular, conjugations → infinitive)
 - **Dictionary Entry Logic**: `is_dictionary_entry?` method determines which words appear in dictionary listings based on POS-specific rules
+- **Hebrew Keyboard**: Interactive on-screen keyboard with SIL layout for users without Hebrew input
+- **Smart Search**: Intelligent Hebrew search with automatic normalization of vowels, cantillation marks, and final forms
 - **JSONB Metadata**: Flexible `form_metadata` column stores grammatical information (binyan, conjugation, number, status, etc.)
 - **GIN Index**: Fast JSONB queries for filtering by metadata fields
 - **Eager Loading**: Optimized queries prevent N+1 issues (includes :glosses, :decks, :part_of_speech_category)
@@ -292,10 +294,13 @@ The application implements a sophisticated lexeme/form system for Hebrew words:
 - `hebrew_sort_key`: Custom Hebrew alphabetical sorting
 
 **Search & Filtering**:
-- Filter by text search (representation or glosses)
+- Filter by text search (representation or glosses) with intelligent normalization
+  - Automatically strips vowels, cantillation marks, and normalizes final forms
+  - Searches are diacritic-insensitive for better Hebrew text matching
 - Filter by POS, binyan, number
 - Filter by lesson (exact or cumulative "or less" mode)
-- Toggle to show all words vs. dictionary entries only
+- Toggle to show all words vs. dictionary entries only (defaults to "show all")
+- Interactive Hebrew keyboard component for users without Hebrew input capability
 
 **Import System**:
 - Supports both text format and JSON format
@@ -417,6 +422,40 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
 - **Read-only for non-owners**: Words and Glosses are read-only for regular users
 
 ## Recent Updates
+
+### Hebrew Keyboard & Enhanced Search (Phase 7)
+- **Interactive Hebrew Keyboard**: On-screen SIL layout keyboard for users without Hebrew input
+  - Reusable partial at `app/views/shared/_hebrew_keyboard.html.erb`
+  - Three-row layout matching physical Hebrew SIL keyboard positions
+  - Sticky shift functionality with visual state indicator (white/blue toggle)
+  - Shifted layout includes final forms (ף ך ץ ן ם), cantillation marks, and punctuation
+  - Special buttons column: Hataf vowels (Qamats, Segol, Patach), Dagesh, Maqaf
+  - CSS overlay technique displays vowel points underneath dotted circle (◌)
+  - Collapsible toggle control to show/hide keyboard
+  - Stimulus controller (`hebrew_keyboard_controller.js`) handles character insertion at cursor position
+  - Supports Space and Backspace keys
+- **Search Normalization**: Intelligent Hebrew search with diacritical stripping
+  - `Word.normalize_hebrew()` method strips vowels, cantillation marks, and converts final forms
+  - Dictionary search normalizes both query and database values via PostgreSQL
+  - Searches ignore cantillation marks (e.g., אֶרֶץ matches אֶ֫רֶץ)
+  - Searches ignore final forms (e.g., נון matches final nun ן)
+  - Final form conversions: ך→כ, ם→מ, ן→נ, ף→פ, ץ→צ
+  - Unicode ranges covered: vowels (U+05B0-05BD, U+05BF-05C2, U+05C4-05C5, U+05C7), cantillation (U+0591-05AF)
+- **Dictionary UX Enhancements**:
+  - "Show all words" checkbox now defaults to checked (shows all forms, not just dictionary entries)
+  - Filter state persists across searches and navigation via session storage
+  - Search field has explicit `id="q"` for keyboard targeting
+  - Fixed SBL Hebrew font filename from SBLHebrew.ttf to SBL_Hbrw.ttf
+- **Part of Speech Categories**: Added "Phrase" and "Quantifier" to seeds
+- **Tilt Development Improvements**:
+  - Enhanced `Tiltfile` to sync `config/` and `db/` directories for live updates
+  - Added `vocab/` to ignore list to prevent unnecessary rebuilds during vocabulary imports
+
+**Technical Implementation:**
+- Hebrew keyboard component uses Stimulus controller for DOM manipulation
+- Search normalization implemented at both model level (`Word.normalize_hebrew`) and controller level (dictionary search)
+- JSONB metadata supports new POS categories without schema changes
+- Session storage preserves user preferences across page loads
 
 ### UI/UX Improvements (Phase 6)
 - **Responsive Navigation**: Modern header with logo, active page highlighting, and user info display
