@@ -6,4 +6,8 @@ class ImportPolicy < ApplicationPolicy
   def create?
     user&.superuser?
   end
+
+  def import_story?
+    user&.superuser?
+  end
 end

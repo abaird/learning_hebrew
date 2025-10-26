@@ -1,0 +1,94 @@
+<% content_for :head do %>
+  <style>
+    .hebrew-story {
+      direction: rtl;
+      font-size: 1.3em;
+      text-align: justify;
+      margin-bottom: 2em;
+      line-height: 1.8;
+    }
+    .verse-hebrew {
+      margin-bottom: 1em;
+    }
+    .english-translation {
+      direction: ltr;
+      text-align: justify;
+      font-size: 1.1em;
+      margin-bottom: 2em;
+    }
+    .english-translation p {
+      margin-bottom: 0.5em;
+    }
+    .interlinear table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1em;
+    }
+    .interlinear td {
+      vertical-align: top;
+      border-bottom: 1px solid #ddd;
+      padding: 8px 12px;
+    }
+    .interlinear td.he {
+      direction: rtl;
+      text-align: right;
+      width: 55%;
+      font-size: 1.1em;
+    }
+    .interlinear td.en {
+      direction: ltr;
+      text-align: left;
+      width: 45%;
+    }
+    .translit {
+      font-style: italic;
+      color: #555;
+      font-size: 0.95em;
+    }
+  </style>
+<% end %>
+
+<div class="w-full">
+  <div class="flex justify-between items-center mb-6">
+    <%= link_to stories_path, class: "text-blue-600 hover:text-blue-800 font-medium" do %>
+      ← Back to Stories
+    <% end %>
+  </div>
+
+  <div class="story-content bg-white rounded-lg shadow-sm p-8">
+    <h2 class="text-center text-2xl font-bold mb-2">📖 <%= @title %></h2>
+
+    <!-- Hebrew Story Section -->
+    <div class="hebrew-story">
+      <% @verses.each do |verse| %>
+        <div class="verse-hebrew">
+          <%= verse['text'] %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- English Translation Section -->
+    <div class="english-translation">
+      <h3 class="text-center text-xl font-semibold mb-4">English Translation</h3>
+      <% @verses.each do |verse| %>
+        <p><%= verse['translation'] %></p>
+      <% end %>
+    </div>
+
+    <!-- Interlinear Table Section -->
+    <div class="interlinear">
+      <h3 class="text-center text-xl font-semibold mb-4">Line-by-Line Interlinear</h3>
+      <table>
+        <% @verses.each do |verse| %>
+          <tr>
+            <td class="en"><%= verse['translation'] %></td>
+            <td class="he">
+              <%= verse['text'] %><br>
+              <span class="translit"><%= verse['transliteration'] %></span>
+            </td>
+          </tr>
+        <% end %>
+      </table>
+    </div>
+  </div>
+</div>

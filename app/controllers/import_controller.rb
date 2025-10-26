@@ -30,6 +30,34 @@ class ImportController < ApplicationController
     end
   end
 
+  def import_story
+    authorize :import
+
+    filename = params[:filename]
+    file_path = Rails.root.join("stories", "#{filename}.json")
+
+    unless File.exist?(file_path)
+      redirect_to new_import_path, alert: "Story file not found: #{filename}.json"
+      return
+    end
+
+    begin
+      json_data = JSON.parse(File.read(file_path))
+
+      # Find or create story
+      story = Story.find_or_initialize_by(slug: filename)
+      story.title = json_data["title"]
+      story.content = json_data
+      story.save!
+
+      redirect_to new_import_path, notice: "Successfully imported story: #{json_data['title']}"
+    rescue JSON::ParserError => e
+      redirect_to new_import_path, alert: "Invalid JSON in #{filename}.json: #{e.message}"
+    rescue => e
+      redirect_to new_import_path, alert: "Failed to import story: #{e.message}"
+    end
+  end
+
   private
 
   def import_words(parsed_data)

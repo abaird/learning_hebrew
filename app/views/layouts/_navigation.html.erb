@@ -30,6 +30,10 @@
             Glosses
           <% end %>
 
+          <%= link_to stories_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(stories_path) ? 'bg-blue-700' : ''}" do %>
+            Stories
+          <% end %>
+
           <% if current_user.superuser? %>
             <%= link_to new_import_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-blue-700 transition #{current_page?(new_import_path) ? 'bg-blue-700' : ''}" do %>
               Import
