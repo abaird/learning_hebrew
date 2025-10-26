@@ -7,6 +7,11 @@ Rails.application.routes.draw do
   # Stories
   resources :stories, only: [ :index, :show ]
 
+  # API endpoints
+  namespace :api do
+    get "dictionary/lookup", to: "dictionary#lookup"
+  end
+
   # Dictionary import (superuser only)
   get "import", to: "import#new", as: :new_import
   post "import", to: "import#create", as: :import
