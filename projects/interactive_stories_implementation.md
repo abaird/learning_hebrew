@@ -93,22 +93,28 @@ For each phase:
 
 **Goal:** Complete database transition and improve story display
 
-- [ ] **Step 2.1:** Refine StoriesController
-  - [ ] Add error handling for missing stories
-  - [ ] Add authorization checks if needed
-  - [ ] Optimize queries with any needed includes
+- [x] **Step 2.1:** Refine StoriesController
+  - [x] Error handling for missing stories (already implemented in Phase 1)
+  - [x] Authorization with `authenticate_user!` (already implemented)
+  - [x] Query optimization (simple queries, no N+1 issues)
 
-- [ ] **Step 2.2:** Polish stories index view
-  - [ ] Style story cards with Tailwind
-  - [ ] Add metadata display (verse count, etc.)
-  - [ ] Add navigation back to main site
+- [x] **Step 2.2:** Polish stories index view
+  - [x] Style story cards with Tailwind (already implemented in Phase 1)
+  - [x] Metadata display shows verse count (already implemented)
+  - [x] Added "Back to Dictionary" navigation link
 
-- [ ] **Testing & Verification**
-  - [ ] Run full test suite
-  - [ ] Verify UI looks good
-  - [ ] Test navigation flows
+- [x] **Testing & Verification**
+  - [x] Run full test suite: All tests passing (301 examples, 0 failures)
+  - [x] UI is well-styled and functional
+  - [x] Navigation flows verified
 
-**Status:** Not Started
+**Status:** ✅ COMPLETED
+
+**Note:** Most Phase 2 requirements were already completed during Phase 1 implementation.
+Only addition was "Back to Dictionary" link on stories index page.
+
+**Files Changed:**
+- `app/views/stories/index.html.erb` - Added navigation back to dictionary
 
 ---
 
@@ -227,7 +233,7 @@ For each phase:
 ## Completion Status
 
 - [x] Phase 1: Story Import System ✅
-- [ ] Phase 2: Update Stories Controller
+- [x] Phase 2: Update Stories Controller ✅
 - [ ] Phase 3: Create Dictionary Lookup API
 - [ ] Phase 4: Build Interactive Story View
 - [ ] Phase 5: Testing & Refinement
