@@ -4,6 +4,7 @@ RSpec.describe "words/show", type: :view do
   fixtures :users, :decks, :words, :deck_words
   before(:each) do
     assign(:word, words(:shalom))
+    assign(:back_url, words_path)
   end
 
   it "renders attributes in <p>" do

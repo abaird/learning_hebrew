@@ -542,6 +542,38 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
   - `app/controllers/dictionary_controller.rb` - SQL filtering and parameter fixes (lines 13, 65-67)
   - `spec/requests/dictionary_spec.rb` - updated tests for new default behavior
 
+### Session Persistence & Development Improvements (Phase 9)
+- **Active Record Session Store**: Implemented database-backed sessions to persist user sessions across app restarts
+  - Added `activerecord-session_store` gem
+  - Created `sessions` table migration (20251012225230) with proper indexes
+  - Configured session store in `config/initializers/session_store.rb`
+  - Users now stay logged in after app/pod restarts
+  - Sessions stored in PostgreSQL with session_id uniqueness constraint
+- **Tilt Configuration Updates**:
+  - Added `*.md` to ignore list to prevent app restarts when editing documentation
+  - Markdown files (CLAUDE.md, README.md, etc.) no longer trigger rebuilds
+- **Test Fixes**:
+  - Fixed view spec failures for `words/edit` and `words/show`
+  - Added missing `@back_url` assignments in view specs
+  - Test suite now passing: 301 examples, 0 failures, 10 pending
+- **Schema Management**:
+  - Fixed test database schema synchronization issues
+  - Updated `db/schema.rb` with new columns (`is_dictionary_entry`, `sessions` table)
+  - Ensured migrations run properly in both development and test environments
+- **Developer Workflow**:
+  - Created `/finish` slash command for end-of-feature workflow
+  - Command runs tests, linting, documentation updates, and commit process
+  - Added `script/finish-feature.sh` helper script for manual workflow
+- **Files Changed**:
+  - `Gemfile` - added activerecord-session_store gem
+  - `db/migrate/20251012225230_add_sessions_table.rb` - sessions table migration
+  - `config/initializers/session_store.rb` - session store configuration
+  - `Tiltfile` - ignore markdown files (line 38)
+  - `db/schema.rb` - updated with latest schema including sessions table
+  - `spec/views/words/edit.html.tailwindcss_spec.rb` - added @back_url assignment
+  - `spec/views/words/show.html.tailwindcss_spec.rb` - added @back_url assignment
+  - `.claude/commands/finish.md` - new slash command for finish workflow
+
 ### UI/UX Improvements (Phase 6)
 - **Responsive Navigation**: Modern header with logo, active page highlighting, and user info display
 - **Superuser Badge**: Visual indicator in navigation for superuser accounts

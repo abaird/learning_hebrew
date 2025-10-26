@@ -35,7 +35,7 @@ docker_build(
     ],
 
     # Only rebuild image when Dockerfile or key dependencies change
-    ignore=['.git', 'tmp/', 'log/', 'storage/', '.port-forward.pid', 'projects/', 'vocab/']
+    ignore=['.git', 'tmp/', 'log/', 'storage/', '.port-forward.pid', 'projects/', 'vocab/', '*.md']
 )
 
 # Apply Kubernetes manifests (use local configurations for minikube)

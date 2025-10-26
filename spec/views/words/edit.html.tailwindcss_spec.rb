@@ -8,6 +8,7 @@ RSpec.describe "words/edit", type: :view do
     assign(:word, word)
     assign(:pos_categories, PartOfSpeechCategory.all)
     assign(:decks, [])
+    assign(:back_url, words_path)
   end
 
   it "renders the edit word form" do

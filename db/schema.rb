@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_10_05_234650) do
+ActiveRecord::Schema[8.0].define(version: 2025_10_12_225230) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -55,6 +55,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_05_234650) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "sessions", force: :cascade do |t|
+    t.string "session_id", null: false
+    t.text "data"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["session_id"], name: "index_sessions_on_session_id", unique: true
+    t.index ["updated_at"], name: "index_sessions_on_updated_at"
+  end
+
   create_table "users", force: :cascade do |t|
     t.text "name"
     t.datetime "created_at", null: false
@@ -87,7 +96,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_10_05_234650) do
     t.string "pos_display"
     t.bigint "lexeme_id"
     t.jsonb "form_metadata", default: {}, null: false
+    t.boolean "is_dictionary_entry", default: true, null: false
     t.index ["form_metadata"], name: "index_words_on_form_metadata", using: :gin
+    t.index ["is_dictionary_entry"], name: "index_words_on_is_dictionary_entry"
     t.index ["lexeme_id"], name: "index_words_on_lexeme_id"
     t.index ["part_of_speech_category_id"], name: "index_words_on_part_of_speech_category_id"
   end
