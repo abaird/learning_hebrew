@@ -9,6 +9,8 @@
     }
     .verse-hebrew {
       margin-bottom: 1em;
+      font-size: 24pt;
+      line-height: 1.8;
     }
     .english-translation {
       direction: ltr;
@@ -45,10 +47,67 @@
       color: #555;
       font-size: 0.95em;
     }
+
+    /* Interactive word styles */
+    .hebrew-word {
+      cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 3px;
+      transition: background-color 0.15s;
+      display: inline-block;
+    }
+
+    .hebrew-word:hover {
+      background-color: #fef3c7;
+    }
+
+    .hebrew-word:active {
+      background-color: #fde68a;
+    }
+
+    /* Popup styles */
+    .word-popup {
+      background: white;
+      border: 2px solid #3b82f6;
+      border-radius: 8px;
+      padding: 12px;
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+      z-index: 1000;
+      max-width: 350px;
+      min-width: 200px;
+      cursor: pointer;
+    }
+
+    .popup-hebrew {
+      font-size: 20pt;
+      font-family: "SBL Hebrew", serif;
+      direction: rtl;
+      margin-bottom: 8px;
+      font-weight: bold;
+    }
+
+    .popup-gloss {
+      font-size: 14pt;
+      margin-bottom: 4px;
+      line-height: 1.4;
+      color: #333;
+    }
+
+    .popup-pos {
+      font-size: 11pt;
+      font-style: italic;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .popup-not-found {
+      color: #dc2626;
+      font-size: 12pt;
+    }
   </style>
 <% end %>
 
-<div class="w-full">
+<div class="w-full" data-controller="hebrew-word">
   <div class="flex justify-between items-center mb-6">
     <%= link_to stories_path, class: "text-blue-600 hover:text-blue-800 font-medium" do %>
       ← Back to Stories
@@ -62,7 +121,11 @@
     <div class="hebrew-story">
       <% @verses.each do |verse| %>
         <div class="verse-hebrew">
-          <%= verse['text'] %>
+          <% tokenize_hebrew(verse['text']).each do |token| %>
+            <%= token[:prefix] %><span class="hebrew-word"
+                  data-word="<%= token[:word] %>"
+                  data-action="click->hebrew-word#showDefinition"><%= token[:word] %></span><%= token[:suffix] %>
+          <% end %>
         </div>
       <% end %>
     </div>

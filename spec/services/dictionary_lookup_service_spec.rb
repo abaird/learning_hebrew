@@ -122,6 +122,19 @@ RSpec.describe DictionaryLookupService do
         expect(result[:found]).to be true
         expect(result[:hebrew]).to eq("שָׁמַע")
       end
+
+      it "removes dagesh after prefix removal (bet preposition with dagesh)" do
+        word = Word.create!(representation: "שָׂדֶה", part_of_speech_category: pos_noun)
+        word.glosses.create!(text: "field")
+
+        # ב prefix with patach and dagesh: בַּ (bet + patach + dagesh)
+        # After removing ב, need to remove both patach AND dagesh
+        result = described_class.lookup("בַּשָׂדֶה")
+
+        expect(result[:found]).to be true
+        expect(result[:hebrew]).to eq("שָׂדֶה")
+        expect(result[:gloss]).to eq("field")
+      end
     end
 
     context "Multiple matches rejection" do

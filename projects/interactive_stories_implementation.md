@@ -164,46 +164,57 @@ Only addition was "Back to Dictionary" link on stories index page.
 
 **Goal:** Add click-to-reveal dictionary popups with Stimulus
 
-- [ ] **Step 4.1:** Create Hebrew tokenizer helper
-  - [ ] Add `tokenize_hebrew` method to `app/helpers/stories_helper.rb`
-  - [ ] Split text on spaces, preserve punctuation
-  - [ ] Return tokens with prefix/word/suffix structure
+- [x] **Step 4.1:** Create Hebrew tokenizer helper
+  - [x] Add `tokenize_hebrew` method to `app/helpers/stories_helper.rb`
+  - [x] Split text on spaces, preserve punctuation
+  - [x] Return tokens with prefix/word/suffix structure using regex
 
-- [ ] **Step 4.2:** Update story show view
-  - [ ] Update `app/views/stories/show.html.erb`
-  - [ ] Add `data-controller="hebrew-word"` to container
-  - [ ] Tokenize Hebrew verses and wrap words in spans
-  - [ ] Add `data-word` and `data-action="click->hebrew-word#showDefinition"` to each word
-  - [ ] Keep English translation section
-  - [ ] Keep interlinear table section
+- [x] **Step 4.2:** Update story show view
+  - [x] Update `app/views/stories/show.html.erb`
+  - [x] Add `data-controller="hebrew-word"` to container
+  - [x] Tokenize Hebrew verses and wrap words in spans
+  - [x] Add `data-word` and `data-action="click->hebrew-word#showDefinition"` to each word
+  - [x] Keep English translation section
+  - [x] Keep interlinear table section
 
-- [ ] **Step 4.3:** Create Stimulus controller
-  - [ ] Create `app/javascript/controllers/hebrew_word_controller.js`
-  - [ ] Implement `showDefinition(event)` method
-  - [ ] Add sessionStorage caching for lookups
-  - [ ] Implement `displayPopup(data, event)` method
-  - [ ] Position popup near click point
-  - [ ] Implement `hideDefinition()` for cleanup
-  - [ ] Add click-anywhere-to-close behavior
+- [x] **Step 4.3:** Create Stimulus controller
+  - [x] Create `app/javascript/controllers/hebrew_word_controller.js`
+  - [x] Implement `showDefinition(event)` method with API call
+  - [x] Add sessionStorage caching for lookups
+  - [x] Implement `displayPopup(data, event)` method
+  - [x] Position popup near click point (pageX + 10, pageY + 10)
+  - [x] Implement `hideDefinition()` for cleanup
+  - [x] Add click-anywhere-to-close behavior
 
-- [ ] **Step 4.4:** Add CSS styles
-  - [ ] Create `app/assets/stylesheets/stories.css` or add to existing
-  - [ ] Style `.hebrew-word` (cursor, hover, active states)
-  - [ ] Style `.word-popup` (border, shadow, positioning)
-  - [ ] Style `.popup-hebrew`, `.popup-gloss`, `.popup-pos`
-  - [ ] Style `.popup-not-found`
-  - [ ] Style `.verse-hebrew` and `.interlinear`
+- [x] **Step 4.4:** Add CSS styles
+  - [x] Added styles to `app/views/stories/show.html.erb` (embedded)
+  - [x] Style `.hebrew-word` (cursor, hover, active states with yellow highlight)
+  - [x] Style `.word-popup` (border, shadow, positioning, z-index 1000)
+  - [x] Style `.popup-hebrew`, `.popup-gloss`, `.popup-pos`
+  - [x] Style `.popup-not-found` (red text)
+  - [x] Style `.verse-hebrew` (24pt font, proper line height)
 
-- [ ] **Testing & Verification**
-  - [ ] Run full test suite
-  - [ ] Test clicking on various Hebrew words
-  - [ ] Verify popup display and positioning
-  - [ ] Verify sessionStorage caching works
-  - [ ] Test words with prefixes
-  - [ ] Test words not in dictionary
-  - [ ] Verify popup closes on click
+- [x] **Testing & Verification**
+  - [x] Run full test suite: All tests passing (318 examples, 0 failures)
+  - [x] User verified: Interactive functionality working
+  - [x] Bug fixes applied:
+    - Fixed popup positioning to stay within viewport
+    - Fixed word-to-word clicking (dismiss old popup, show new)
+    - Added test for dagesh handling in prefix removal
+  - [x] Rubocop: No style violations
 
-**Status:** Not Started
+**Status:** ✅ COMPLETED
+
+**Files Changed:**
+- `app/helpers/stories_helper.rb` - Hebrew tokenizer with regex splitting
+- `app/views/stories/show.html.erb` - Interactive word spans with Stimulus and CSS
+- `app/javascript/controllers/hebrew_word_controller.js` - Click handler with viewport-aware positioning
+- `spec/services/dictionary_lookup_service_spec.rb` - Added dagesh test case
+
+**Bug Fixes:**
+- Popup now adjusts position to stay fully visible in viewport
+- Clicking word-to-word now properly dismisses old popup and shows new one
+- Click listener management prevents event conflicts
 
 ---
 
@@ -241,7 +252,7 @@ Only addition was "Back to Dictionary" link on stories index page.
 - [x] Phase 1: Story Import System ✅
 - [x] Phase 2: Update Stories Controller ✅
 - [x] Phase 3: Create Dictionary Lookup API ✅
-- [ ] Phase 4: Build Interactive Story View
+- [x] Phase 4: Build Interactive Story View ✅
 - [ ] Phase 5: Testing & Refinement
 
 ---
