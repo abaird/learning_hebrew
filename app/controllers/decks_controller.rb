@@ -4,7 +4,7 @@ class DecksController < ApplicationController
   # GET /decks or /decks.json
   def index
     authorize Deck
-    @decks = Deck.all
+    @decks = Deck.page(params[:page]).per(25)
   end
 
   # GET /decks/1 or /decks/1.json

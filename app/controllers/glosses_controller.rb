@@ -4,7 +4,7 @@ class GlossesController < ApplicationController
   # GET /glosses or /glosses.json
   def index
     authorize Gloss
-    @glosses = Gloss.all
+    @glosses = Gloss.includes(:word).page(params[:page]).per(25)
   end
 
   # GET /glosses/1 or /glosses/1.json

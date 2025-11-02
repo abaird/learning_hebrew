@@ -7,6 +7,8 @@ RSpec.describe "Dictionaries", type: :request do
     sign_in user
   end
 
+  it_behaves_like "paginatable", :dictionary_index, Word, { representation: "שלום" }, -> { "/dictionary" }
+
   describe "GET /index" do
     it "returns http success" do
       get root_path

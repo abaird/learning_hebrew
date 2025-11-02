@@ -59,6 +59,7 @@ RSpec.describe "/words", type: :request do
     before { sign_in regular_user }
 
     include_examples "accessible to all authenticated users"
+    it_behaves_like "paginatable", :words, Word, { representation: "שלום" }
 
     describe "GET /new" do
       it "redirects to root with authorization error" do

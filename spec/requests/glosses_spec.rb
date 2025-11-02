@@ -58,6 +58,7 @@ RSpec.describe "/glosses", type: :request do
     before { sign_in regular_user }
 
     include_examples "accessible to all authenticated users"
+    it_behaves_like "paginatable", :glosses, Gloss, { text: "peace", word_id: -> { Word.first&.id || Word.create!(representation: "test").id } }
 
     describe "GET /new" do
       it "redirects to root with authorization error" do

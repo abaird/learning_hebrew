@@ -40,6 +40,8 @@ RSpec.describe "/decks", type: :request do
     sign_in user
   end
 
+  it_behaves_like "paginatable", :decks, Deck, { name: "Test Deck", description: "A test deck", user_id: -> { User.first&.id || User.create!(email: "test@example.com", password: "password").id } }
+
   describe "GET /index" do
     it "renders a successful response" do
       Deck.create! valid_attributes

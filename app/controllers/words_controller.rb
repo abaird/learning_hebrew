@@ -4,7 +4,7 @@ class WordsController < ApplicationController
   # GET /words or /words.json
   def index
     authorize Word
-    @words = Word.includes(:decks, :glosses).all
+    @words = Word.includes(:decks, :glosses).page(params[:page]).per(25)
   end
 
   # GET /words/1 or /words/1.json
