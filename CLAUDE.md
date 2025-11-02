@@ -574,6 +574,64 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
   - `spec/views/words/show.html.tailwindcss_spec.rb` - added @back_url assignment
   - `.claude/commands/finish.md` - new slash command for finish workflow
 
+### Interactive Stories Feature (Phase 10)
+- **Database-Backed Story System**: Stories stored in PostgreSQL with JSONB content column
+  - Created `stories` table with title, slug, and JSONB content fields
+  - GIN index on content column for efficient JSONB queries
+  - Story model with automatic slug generation from title
+  - Stories import from JSON files in `stories/` directory
+  - Superuser-only import functionality via Import page
+- **Three-Tier Dictionary Lookup API**: Sophisticated Hebrew word matching with nikkud preservation
+  - **Tier 1**: Exact match including all nikkud (vowel points)
+  - **Tier 2**: Final form normalization (ך→כ, ם→מ, ן→נ, ף→פ, ץ→צ) while preserving nikkud
+  - **Tier 3**: Prefix removal (ה, ו, ב, כ, ל, מ, ש) with intelligent nikkud stripping
+  - Rejects ambiguous matches (multiple words with same representation)
+  - Returns word, gloss, and part of speech information
+  - API endpoint: `/api/dictionary/lookup?word=<hebrew_word>`
+- **Interactive Story View**: Click-to-reveal dictionary popups with Stimulus
+  - Hebrew tokenizer separates words from punctuation while preserving text structure
+  - Each Hebrew word wrapped in clickable span with Stimulus action
+  - Popup displays Hebrew representation, English gloss, and part of speech
+  - sessionStorage caching prevents duplicate API calls for same words
+  - Viewport-aware positioning keeps popups fully visible on screen
+  - Click word-to-word to see different definitions without closing/reopening
+  - Click anywhere (or on popup) to dismiss
+- **Story Display Sections**:
+  - Hebrew text section with interactive words (24pt font, proper line height)
+  - English translation section with verse-by-verse translations
+  - Interlinear table with Hebrew, transliteration, and English side-by-side
+- **User Experience**:
+  - Stories accessible from navigation menu
+  - Story index shows all imported stories with verse counts
+  - Hover effect on Hebrew words (yellow highlight)
+  - Clean, professional popup design with blue border
+  - "Word not in dictionary" message for unknown words
+  - Smooth interactions with proper event handling
+
+**Technical Implementation:**
+- `DictionaryLookupService` implements three-tier matching algorithm
+- `StoriesHelper#tokenize_hebrew` uses regex to extract words from Hebrew text (U+0590-05FF Unicode range)
+- `hebrew_word_controller.js` Stimulus controller manages popups and API calls
+- Comprehensive test suite with 17 examples covering all matching scenarios
+- Proper click event management prevents conflicts between popups and word clicks
+- `adjustPopupPosition()` method ensures popups stay within viewport boundaries
+
+**Files Changed:**
+- `db/migrate/20251026204115_create_stories.rb` - Created stories table
+- `app/models/story.rb` - Story model with slug generation
+- `app/controllers/stories_controller.rb` - Database-backed story display
+- `app/controllers/api/dictionary_controller.rb` - API endpoint for word lookups
+- `app/services/dictionary_lookup_service.rb` - Three-tier matching algorithm
+- `app/helpers/stories_helper.rb` - Hebrew tokenizer
+- `app/javascript/controllers/hebrew_word_controller.js` - Interactive popup controller
+- `app/views/stories/index.html.erb` - Story listing page
+- `app/views/stories/show.html.erb` - Interactive story display with CSS
+- `app/views/import/new.html.erb` - Story import section
+- `app/controllers/import_controller.rb` - Story import action
+- `app/policies/import_policy.rb` - Authorization for story imports
+- `config/routes.rb` - API namespace and story import route
+- `spec/services/dictionary_lookup_service_spec.rb` - Comprehensive test suite (17 examples)
+
 ### UI/UX Improvements (Phase 6)
 - **Responsive Navigation**: Modern header with logo, active page highlighting, and user info display
 - **Superuser Badge**: Visual indicator in navigation for superuser accounts

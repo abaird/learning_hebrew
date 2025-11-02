@@ -2,24 +2,23 @@
   <style>
     .hebrew-story {
       direction: rtl;
-      font-size: 1.3em;
       text-align: justify;
       margin-bottom: 2em;
       line-height: 1.8;
+      font-size: 24px;
     }
     .verse-hebrew {
-      margin-bottom: 1em;
-      font-size: 24pt;
-      line-height: 1.8;
+      display: inline;
     }
     .english-translation {
       direction: ltr;
       text-align: justify;
       font-size: 1.1em;
       margin-bottom: 2em;
+      line-height: 1.8;
     }
-    .english-translation p {
-      margin-bottom: 0.5em;
+    .verse-english {
+      display: inline;
     }
     .interlinear table {
       width: 100%;
@@ -35,7 +34,7 @@
       direction: rtl;
       text-align: right;
       width: 55%;
-      font-size: 1.1em;
+      font-size: 24px !important;
     }
     .interlinear td.en {
       direction: ltr;
@@ -45,13 +44,14 @@
     .translit {
       font-style: italic;
       color: #555;
-      font-size: 0.95em;
+      font-size: 16px !important;
     }
 
     /* Interactive word styles */
     .hebrew-word {
       cursor: pointer;
-      padding: 2px 4px;
+      padding: 1px 1px;
+      font-size: 32px;
       border-radius: 3px;
       transition: background-color 0.15s;
       display: inline-block;
@@ -104,7 +104,55 @@
       color: #dc2626;
       font-size: 12pt;
     }
+
+    /* Collapsible section styles */
+    .collapsible-section {
+      margin-bottom: 2em;
+    }
+    .collapsible-header {
+      cursor: pointer;
+      padding: 12px 16px;
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: background-color 0.2s;
+    }
+    .collapsible-header:hover {
+      background-color: #e5e7eb;
+    }
+    .collapsible-header .arrow {
+      transition: transform 0.3s;
+      font-size: 1.2rem;
+    }
+    .collapsible-header.active .arrow {
+      transform: rotate(90deg);
+    }
+    .collapsible-content {
+      display: none;
+      padding: 16px;
+      border: 1px solid #d1d5db;
+      border-top: none;
+      border-radius: 0 0 6px 6px;
+    }
+    .collapsible-content.active {
+      display: block;
+    }
   </style>
+
+  <script>
+    function toggleCollapsible(id) {
+      const content = document.getElementById(id);
+      const header = content.previousElementSibling;
+
+      content.classList.toggle('active');
+      header.classList.toggle('active');
+    }
+  </script>
 <% end %>
 
 <div class="w-full" data-controller="hebrew-word">
@@ -118,40 +166,54 @@
     <h2 class="text-center text-2xl font-bold mb-2">📖 <%= @title %></h2>
 
     <!-- Hebrew Story Section -->
-    <div class="hebrew-story">
+    <div class="hebrew-story text-3xl font-hebrew">
       <% @verses.each do |verse| %>
-        <div class="verse-hebrew">
+        <span class="verse-hebrew">
           <% tokenize_hebrew(verse['text']).each do |token| %>
             <%= token[:prefix] %><span class="hebrew-word"
                   data-word="<%= token[:word] %>"
                   data-action="click->hebrew-word#showDefinition"><%= token[:word] %></span><%= token[:suffix] %>
           <% end %>
-        </div>
+        </span>
       <% end %>
     </div>
 
     <!-- English Translation Section -->
-    <div class="english-translation">
-      <h3 class="text-center text-xl font-semibold mb-4">English Translation</h3>
-      <% @verses.each do |verse| %>
-        <p><%= verse['translation'] %></p>
-      <% end %>
+    <div class="collapsible-section">
+      <div class="collapsible-header" onclick="toggleCollapsible('english-section')">
+        <span>English Translation</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div id="english-section" class="collapsible-content">
+        <div class="english-translation">
+          <% @verses.each do |verse| %>
+            <span class="verse-english"><%= verse['translation'] %> </span>
+          <% end %>
+        </div>
+      </div>
     </div>
 
     <!-- Interlinear Table Section -->
-    <div class="interlinear">
-      <h3 class="text-center text-xl font-semibold mb-4">Line-by-Line Interlinear</h3>
-      <table>
-        <% @verses.each do |verse| %>
-          <tr>
-            <td class="en"><%= verse['translation'] %></td>
-            <td class="he">
-              <%= verse['text'] %><br>
-              <span class="translit"><%= verse['transliteration'] %></span>
-            </td>
-          </tr>
-        <% end %>
-      </table>
+    <div class="collapsible-section">
+      <div class="collapsible-header" onclick="toggleCollapsible('interlinear-section')">
+        <span>Line-by-Line Interlinear</span>
+        <span class="arrow">▶</span>
+      </div>
+      <div id="interlinear-section" class="collapsible-content">
+        <div class="interlinear">
+          <table>
+            <% @verses.each do |verse| %>
+              <tr>
+                <td class="en"><%= verse['translation'] %></td>
+                <td class="he text-3xl font-hebrew">
+                  <%= verse['text'] %><br>
+                  <span class="translit"><%= verse['transliteration'] %></span>
+                </td>
+              </tr>
+            <% end %>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 </div>
