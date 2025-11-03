@@ -4,8 +4,8 @@
 require 'digest'
 
 # Unicode ranges for Hebrew marks
-HEBREW_CANTILLATION = (0x0591..0x05AF).to_a.map { |cp| [cp].pack('U') }.join
-HEBREW_VOWEL_POINTS = (0x05B0..0x05BD).to_a.map { |cp| [cp].pack('U') }.join +
+HEBREW_CANTILLATION = (0x0591..0x05AF).to_a.map { |cp| [ cp ].pack('U') }.join
+HEBREW_VOWEL_POINTS = (0x05B0..0x05BD).to_a.map { |cp| [ cp ].pack('U') }.join +
                       "\u05BF\u05C1\u05C2\u05C4\u05C5\u05C7"  # Additional vowel marks
 HEBREW_DAGESH_MAPPIQ = "\u05BC"  # Dagesh/Mappiq (keep this - it's pronunciation)
 

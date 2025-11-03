@@ -486,6 +486,41 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
 
 ## Recent Updates
 
+### Audio Support Infrastructure (Phase 1 - November 2025)
+- **Active Storage Setup**: Configured Rails Active Storage for audio file management
+  - Installed Active Storage migrations (3 tables: blobs, attachments, variant_records)
+  - Added `google-cloud-storage` gem (~> 1.47) for GCS integration
+  - Configured `config/storage.yml` with separate dev/prod GCS buckets
+  - Production environment now uses `:google_prod` storage service
+  - Development uses `:local` storage, test uses `:test` storage
+- **Google Cloud Storage Buckets**: Created two GCS buckets for audio files
+  - `learning-hebrew-audio-dev` (development/staging environment)
+  - `learning-hebrew-audio-prod` (production environment)
+  - Both buckets in `us-central1` region with uniform bucket-level access
+- **Service Account & Permissions**: Created dedicated service account for storage access
+  - Service account: `audio-storage-sa@learning-hebrew-1758491674.iam.gserviceaccount.com`
+  - Granted `roles/storage.objectAdmin` to both dev and prod buckets
+  - Generated credentials key and stored in Google Secret Manager
+  - GitHub Actions service account has `secretmanager.secretAccessor` role for CI/CD
+  - Credentials file (`config/gcs_key.json`) added to `.gitignore` for security
+- **Testing & Validation**:
+  - All existing tests pass (338 examples, 0 failures)
+  - Successfully tested blob creation/deletion in Rails console
+  - Verified migrations run cleanly in both development and test environments
+  - Rubocop passes with no offenses
+
+**Technical Details:**
+- Active Storage uses polymorphic attachments for flexible file association
+- GCS credentials mounted via Secret Manager (not checked into git)
+- Production will serve audio files directly from GCS (not through Rails)
+- Local development uses filesystem storage for faster iteration
+
+**Next Steps (Phase 2):**
+- Add `audio_identifier` column to words table
+- Implement audio attachment on Word model
+- Generate permanent hash-based identifiers for all words
+- Create helper methods for audio presence/URL
+
 ### Hebrew Keyboard & Enhanced Search (Phase 7)
 - **Interactive Hebrew Keyboard**: On-screen SIL layout keyboard for users without Hebrew input
   - Reusable partial at `app/views/shared/_hebrew_keyboard.html.erb`

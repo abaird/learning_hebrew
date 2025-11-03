@@ -70,9 +70,9 @@ puts "\nMore Examples:"
 puts "=" * 60
 
 examples = [
-  ["\u05E9\u05C1\u05B0", "\u05E9\u05B0\u05C1", "shin + shin-dot + shva vs shin + shva + shin-dot"],
-  ["\u05D1\u05BC\u05B0", "\u05D1\u05B0\u05BC", "bet + dagesh + shva vs bet + shva + dagesh"],
-  ["\u05DB\u05BC\u05B8", "\u05DB\u05B8\u05BC", "kaf + dagesh + qamats vs kaf + qamats + dagesh"]
+  [ "\u05E9\u05C1\u05B0", "\u05E9\u05B0\u05C1", "shin + shin-dot + shva vs shin + shva + shin-dot" ],
+  [ "\u05D1\u05BC\u05B0", "\u05D1\u05B0\u05BC", "bet + dagesh + shva vs bet + shva + dagesh" ],
+  [ "\u05DB\u05BC\u05B8", "\u05DB\u05B8\u05BC", "kaf + dagesh + qamats vs kaf + qamats + dagesh" ]
 ]
 
 examples.each do |text_a, text_b, desc|

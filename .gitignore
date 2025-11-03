@@ -45,4 +45,4 @@ k8s/secrets-local.yaml
 tilt_modules/
 
 vocab/*
-/.claude/settings.local.json
+/.claude/settings.local.jsonconfig/gcs_key.json
