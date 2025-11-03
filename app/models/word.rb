@@ -9,6 +9,9 @@ class Word < ApplicationRecord
 
   belongs_to :part_of_speech_category, optional: true
 
+  # Audio file attachment
+  has_one_attached :audio_file
+
   # JSONB store accessors for form_metadata
   store_accessor :form_metadata,
     # Import fields
@@ -49,6 +52,10 @@ class Word < ApplicationRecord
 
   validates :representation, presence: true
 
+  # Active Storage validations
+  validate :validate_audio_file, if: :audio_file_attached?
+
+  before_create :generate_audio_identifier!, unless: :audio_identifier?
   before_save :update_pos_display
   before_save :set_dictionary_entry_flag
 
@@ -108,6 +115,46 @@ class Word < ApplicationRecord
     return "" if text.blank?
     text.gsub(HEBREW_DIACRITICALS, "")
         .tr("ךםןףץ", "כמנפצ")  # Convert final forms to regular forms
+  end
+
+  # Generate permanent audio identifier from Hebrew text
+  # This can be used standalone for naming audio files externally
+  # Returns a 12-character hexadecimal hash
+  def self.hash_hebrew_text(hebrew_text)
+    require "digest"
+
+    # Step 1: Normalize Unicode to NFC (canonical composition)
+    normalized = hebrew_text.unicode_normalize(:nfc)
+
+    # Step 2: Strip cantillation marks (U+0591-U+05AF)
+    # Keep vowel points and dagesh (they affect pronunciation)
+    cleaned = normalized.gsub(/[\u0591-\u05AF]/, "")
+
+    # Step 3: Encode to UTF-8 bytes (Ruby strings are already UTF-8)
+    utf8_bytes = cleaned.encode("UTF-8")
+
+    # Step 4: Compute SHA-256 hash
+    hash = Digest::SHA256.hexdigest(utf8_bytes)
+
+    # Step 5: Take first 12 characters (48 bits)
+    hash[0...12]
+  end
+
+  # Generate audio_identifier for this word
+  def generate_audio_identifier!
+    self.audio_identifier = self.class.hash_hebrew_text(representation)
+    save! if persisted?
+  end
+
+  # Check if audio file is attached
+  def audio_attached?
+    audio_file.attached?
+  end
+
+  # Get URL for audio file
+  def audio_url
+    return nil unless audio_attached?
+    Rails.application.routes.url_helpers.rails_blob_path(audio_file, only_path: true)
   end
 
   # Returns formatted glosses as numbered list: "1) peace, 2) hello"
@@ -219,6 +266,24 @@ class Word < ApplicationRecord
   end
 
   private
+
+  def audio_file_attached?
+    audio_file.attached?
+  end
+
+  def validate_audio_file
+    return unless audio_file.attached?
+
+    # Validate content type
+    unless audio_file.content_type.in?(%w[audio/mpeg audio/mp3])
+      errors.add(:audio_file, "must be an MP3 file")
+    end
+
+    # Validate file size
+    if audio_file.byte_size > 5.megabytes
+      errors.add(:audio_file, "must be less than 5MB")
+    end
+  end
 
   def update_pos_display
     self.pos_display = formatted_pos

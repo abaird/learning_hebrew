@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_11_03_000221) do
+ActiveRecord::Schema[8.0].define(version: 2025_11_03_025102) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -135,6 +135,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_11_03_000221) do
     t.bigint "lexeme_id"
     t.jsonb "form_metadata", default: {}, null: false
     t.boolean "is_dictionary_entry", default: true, null: false
+    t.string "audio_identifier"
+    t.index ["audio_identifier"], name: "index_words_on_audio_identifier"
     t.index ["form_metadata"], name: "index_words_on_form_metadata", using: :gin
     t.index ["is_dictionary_entry"], name: "index_words_on_is_dictionary_entry"
     t.index ["lexeme_id"], name: "index_words_on_lexeme_id"

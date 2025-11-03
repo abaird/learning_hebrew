@@ -518,11 +518,41 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
 - Production will serve audio files directly from GCS (not through Rails)
 - Local development uses filesystem storage for faster iteration
 
-**Next Steps (Phase 2):**
-- Add `audio_identifier` column to words table
-- Implement audio attachment on Word model
-- Generate permanent hash-based identifiers for all words
-- Create helper methods for audio presence/URL
+### Audio Identifiers & Word Model Integration (Phase 2 - November 2025)
+- **Audio Identifier System**: Implemented cryptographic hash-based audio file identification
+  - Added `audio_identifier` column to words table (string, indexed, non-unique)
+  - Hash algorithm: SHA-256 of Unicode-normalized Hebrew text (first 12 characters)
+  - Strips cantillation marks (U+0591-U+05AF) but preserves vowel points
+  - Multiple words can share same identifier (e.g., words differing only in cantillation)
+  - Auto-generated via `before_create` callback on Word model
+  - Backfilled all 618 existing words with identifiers during migration
+- **Word Model Audio Support**: Added audio attachment capability to Word model
+  - `has_one_attached :audio_file` association via Active Storage
+  - Helper methods: `audio_attached?` and `audio_url`
+  - Validations: MP3 content type only, max 5MB file size
+  - Audio identifier generation: `Word.hash_hebrew_text(hebrew_text)` class method
+- **Testing**: Comprehensive test coverage for audio features
+  - Hash generation: consistency, format validation, Unicode normalization
+  - Audio identifier: auto-generation, cantillation handling, shared identifiers
+  - Audio attachment: file upload, URL generation, validations (content type, size)
+  - All tests pass (352 examples, 0 failures)
+- **Key Insight**: Words with identical pronunciation (differing only in cantillation) share audio files
+  - Example: וָאֹמַר and וָאֹמַ֫ר both have identifier `0aa1193c45d4`
+  - Efficient storage: one audio file serves multiple word variants
+  - Index is non-unique to support this design
+
+**Technical Implementation:**
+- Migration 20251103025102: adds column, index, and backfills existing data
+- Hash algorithm location: `app/models/word.rb:124-142`
+- Validation logic: `app/models/word.rb:275-287`
+- Test coverage: `spec/models/word_spec.rb:451-580` (29 new tests)
+- Sample audio fixture: `spec/fixtures/files/sample_audio.mp3`
+
+**Next Steps (Phase 3):**
+- Create reusable audio player UI component
+- Add audio buttons to word show and dictionary pages
+- Implement lazy loading (only fetch when user clicks play)
+- Style audio controls with Tailwind CSS
 
 ### Hebrew Keyboard & Enhanced Search (Phase 7)
 - **Interactive Hebrew Keyboard**: On-screen SIL layout keyboard for users without Hebrew input

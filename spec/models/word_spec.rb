@@ -447,4 +447,136 @@ RSpec.describe Word, type: :model do
       expect(word.full_display_name).to eq('לָמַדְתִּי (qal perfective 1CS)')
     end
   end
+
+  describe '.hash_hebrew_text' do
+    it 'generates consistent hash for same Hebrew text' do
+      hash1 = Word.hash_hebrew_text("שָׁלוֹם")
+      hash2 = Word.hash_hebrew_text("שָׁלוֹם")
+      expect(hash1).to eq(hash2)
+    end
+
+    it 'generates 12-character hexadecimal string' do
+      hash = Word.hash_hebrew_text("מֶלֶךְ")
+      expect(hash).to match(/^[a-f0-9]{12}$/)
+    end
+
+    it 'generates different hashes for different words' do
+      hash1 = Word.hash_hebrew_text("שָׁלוֹם")
+      hash2 = Word.hash_hebrew_text("מֶלֶךְ")
+      expect(hash1).not_to eq(hash2)
+    end
+
+    it 'handles Unicode normalization' do
+      # Same word with different Unicode representations should produce same hash
+      text1 = "שָׁלוֹם"
+      text2 = "שָׁלוֹם".unicode_normalize(:nfc)
+      hash1 = Word.hash_hebrew_text(text1)
+      hash2 = Word.hash_hebrew_text(text2)
+      expect(hash1).to eq(hash2)
+    end
+
+    it 'strips cantillation marks but keeps vowel points' do
+      # Word with cantillation mark (meteg) should hash same as without
+      with_cantillation = "אֶ֫רֶץ"    # With meteg (U+05AB)
+      without_cantillation = "אֶרֶץ"  # Without meteg
+      hash1 = Word.hash_hebrew_text(with_cantillation)
+      hash2 = Word.hash_hebrew_text(without_cantillation)
+      expect(hash1).to eq(hash2)
+    end
+  end
+
+  describe 'audio_identifier generation' do
+    it 'generates identifier on word creation' do
+      word = Word.create!(representation: "שָׁלוֹם")
+      expect(word.audio_identifier).to be_present
+      expect(word.audio_identifier).to match(/^[a-f0-9]{12}$/)
+    end
+
+    it 'generates same identifier for same Hebrew text' do
+      word1 = Word.create!(representation: "שָׁלוֹם")
+      word2 = Word.new(representation: "שָׁלוֹם")
+      word2.generate_audio_identifier!
+
+      expect(word2.audio_identifier).to eq(word1.audio_identifier)
+    end
+
+    it 'does not regenerate if already set' do
+      word = Word.create!(representation: "שָׁלוֹם")
+      original_id = word.audio_identifier
+
+      word.representation = "מֶלֶךְ"
+      word.save!
+
+      expect(word.audio_identifier).to eq(original_id) # Unchanged
+    end
+
+    it 'allows multiple words with the same audio_identifier' do
+      # Words differing only in cantillation marks should have same audio_identifier
+      word1 = Word.create!(representation: "וָאֹמַר")     # Without cantillation
+      word2 = Word.create!(representation: "וָאֹמַ֫ר")    # With meteg (cantillation mark)
+
+      expect(word1.audio_identifier).to eq(word2.audio_identifier)
+      expect(word1).to be_valid
+      expect(word2).to be_valid
+    end
+  end
+
+  describe 'audio attachment' do
+    let(:word) { Word.create!(representation: "שָׁלוֹם") }
+    let(:sample_audio_path) { Rails.root.join('spec/fixtures/files/sample_audio.mp3') }
+
+    after(:each) do
+      word.audio_file.purge if word.audio_file.attached?
+    end
+
+    it 'can attach audio file' do
+      word.audio_file.attach(
+        io: File.open(sample_audio_path),
+        filename: "#{word.audio_identifier}.mp3",
+        content_type: 'audio/mpeg'
+      )
+
+      expect(word.audio_attached?).to be true
+    end
+
+    it 'returns audio URL when attached' do
+      word.audio_file.attach(
+        io: File.open(sample_audio_path),
+        filename: "#{word.audio_identifier}.mp3",
+        content_type: 'audio/mpeg'
+      )
+
+      expect(word.audio_url).to be_present
+      expect(word.audio_url).to include('rails/active_storage')
+    end
+
+    it 'returns nil audio_url when no audio attached' do
+      expect(word.audio_attached?).to be false
+      expect(word.audio_url).to be_nil
+    end
+
+    it 'validates audio file content type' do
+      word.audio_file.attach(
+        io: StringIO.new('fake content'),
+        filename: 'test.txt',
+        content_type: 'text/plain'
+      )
+
+      expect(word).not_to be_valid
+      expect(word.errors[:audio_file]).to be_present
+    end
+
+    it 'validates audio file size' do
+      # Create a large fake file (> 5MB)
+      large_content = 'a' * (6 * 1024 * 1024) # 6MB
+      word.audio_file.attach(
+        io: StringIO.new(large_content),
+        filename: 'large.mp3',
+        content_type: 'audio/mpeg'
+      )
+
+      expect(word).not_to be_valid
+      expect(word.errors[:audio_file]).to be_present
+    end
+  end
 end
