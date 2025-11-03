@@ -33,7 +33,14 @@ class ImportController < ApplicationController
   def import_story
     authorize :import
 
-    filename = params[:filename]
+    # Sanitize filename to prevent path traversal attacks
+    filename = sanitize_filename(params[:filename])
+
+    unless filename
+      redirect_to new_import_path, alert: "Invalid filename"
+      return
+    end
+
     file_path = Rails.root.join("stories", "#{filename}.json")
 
     unless File.exist?(file_path)
@@ -42,7 +49,7 @@ class ImportController < ApplicationController
     end
 
     begin
-      json_data = JSON.parse(File.read(file_path))
+      json_data = JSON.parse(File.read(file_path)) # brakeman:ignore:FileAccess
 
       # Find or create story
       story = Story.find_or_initialize_by(slug: filename)
@@ -134,5 +141,18 @@ class ImportController < ApplicationController
     entry[:glosses].each do |gloss_text|
       word.glosses.create!(text: gloss_text)
     end
+  end
+
+  def sanitize_filename(filename)
+    return nil if filename.blank?
+
+    # Remove any directory components (prevent path traversal)
+    basename = File.basename(filename)
+
+    # Only allow alphanumeric characters, hyphens, and underscores
+    # This prevents any path traversal attempts or special characters
+    return nil unless basename.match?(/\A[a-zA-Z0-9_-]+\z/)
+
+    basename
   end
 end

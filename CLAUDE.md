@@ -196,9 +196,12 @@ script/test-css.sh
 ```
 
 ### Git Integration
-- **Pre-push hook**: Automatically runs Rubocop before `git push` to prevent CI failures
-- **Override**: Use `git push --no-verify` to skip Rubocop check if needed
-- **Auto-fix suggestion**: Hook provides `bundle exec rubocop -A` command when violations found
+- **Pre-push hook**: Automatically runs Rubocop and Brakeman before `git push` to prevent CI failures
+  - Rubocop checks code style and best practices
+  - Brakeman scans for security vulnerabilities
+- **Override**: Use `git push --no-verify` to skip checks if needed (not recommended)
+- **Auto-fix suggestion**: Hook provides `bundle exec rubocop -A` command when style violations found
+- **Hook location**: `~/.git_template.local/hooks/pre-push` (symlinked from dotfiles)
 
 ## Architecture
 
@@ -741,7 +744,7 @@ curl -s https://learning-hebrew.bairdsnet.net/up | jq .environment
 - **Bootstrap script**: `script/bootstrap.sh` for automated minikube setup from scratch
 - **Environment switching scripts**: `script/dev.sh` and `script/prod.sh` for easy context switching
 - **Automatic port forwarding**: Development script auto-starts localhost access
-- **Pre-push Git hooks**: Rubocop runs automatically before push to prevent CI failures
+- **Pre-push Git hooks**: Rubocop and Brakeman run automatically before push to prevent CI failures
 - **Deployment diagnostics**: Enhanced `/up` endpoint shows Git SHA, build info, and system status
 - **Test environment isolation**: `script/test.sh` runs tests in proper test environment with separate database
 - **Database configuration**: Smart host detection for local vs containerized environments using environment variables

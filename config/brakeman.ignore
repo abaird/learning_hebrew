@@ -1,0 +1,29 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "File Access",
+      "warning_code": 16,
+      "fingerprint": "69ac2cc9ce835d8ddf28ecae618c675e5adca9150746467b311df74b2689619f",
+      "check_name": "FileAccess",
+      "message": "Parameter value used in file name",
+      "file": "app/controllers/import_controller.rb",
+      "line": 52,
+      "link": "https://brakemanscanner.org/docs/warning_types/file_access/",
+      "code": "File.read(Rails.root.join(\"stories\", \"#{sanitize_filename(params[:filename])}.json\"))",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "ImportController",
+        "method": "import_story"
+      },
+      "user_input": "params[:filename]",
+      "confidence": "Weak",
+      "cwe_id": [
+        22
+      ],
+      "note": "False positive: filename is sanitized via sanitize_filename method which: 1) Uses File.basename to remove directory components, 2) Validates only alphanumeric, hyphens, and underscores are allowed (regex: /\\A[a-zA-Z0-9_-]+\\z/), 3) Returns nil for invalid input. Additionally, File.exist? check is performed before reading. Path traversal is not possible."
+    }
+  ],
+  "updated": "2025-11-02 00:00:00 +0000",
+  "brakeman_version": "7.1.0"
+}
