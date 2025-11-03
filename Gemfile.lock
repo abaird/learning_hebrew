@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/ruby/net-pop.git
-  revision: e8d0afe2773b9eb6a23c39e9e437f6fc0fc7c733
+  revision: a598cffe7615502632e4a5e6e93053c80a3a34e1
   specs:
     net-pop (0.1.2)
       net-protocol
@@ -465,7 +465,7 @@ GEM
     thruster (0.1.15-arm64-darwin)
     thruster (0.1.15-x86_64-darwin)
     thruster (0.1.15-x86_64-linux)
-    timeout (0.4.3)
+    timeout (0.4.4)
     trailblazer-option (0.1.2)
     tsort (0.2.0)
     turbo-rails (2.0.17)
